@@ -70,7 +70,7 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        
+
         /* Styles for Social Media Assistant */
         .social-dropdown {
             opacity: 0;
@@ -286,21 +286,33 @@
                         </section>
                     </div>
                 </div>
-                
+
                 <div id="tab-content-location" class="hidden">
                     <!-- LOCATION ANALYSIS CONTENT -->
                     <div class="space-y-6">
                         <section>
                             <h2 id="location-analysis-title" class="text-xl font-semibold mb-2 text-slate-900">Location Analysis</h2>
-                            <div class="flex flex-col sm:flex-row gap-2 no-print">
-                                <input type="text" id="location-search-input" placeholder="Enter a city and state (e.g., Scottsdale, AZ)" class="flex-grow block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                <button id="location-search-btn" class="w-full sm:w-auto bg-indigo-600 text-white font-semibold py-2 px-6 rounded-lg hover:bg-indigo-700 transition-colors flex items-center justify-center">
-                                    <span id="search-btn-text">Analyze</span>
-                                    <svg id="search-btn-spinner" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                                </button>
+                             <!-- Updated Input Area -->
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+                                <div>
+                                    <label for="location-city-input" class="block text-sm font-medium text-slate-700">City</label>
+                                    <input type="text" id="location-city-input" placeholder="e.g., Lake Mary" value="Lake Mary" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                </div>
+                                <div>
+                                    <label for="location-state-input" class="block text-sm font-medium text-slate-700">State</label>
+                                    <input type="text" id="location-state-input" placeholder="e.g., FL" value="FL" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                </div>
+                                <div>
+                                    <label for="location-zip-input" class="block text-sm font-medium text-slate-700">Zip Code (Optional)</label>
+                                    <input type="text" id="location-zip-input" placeholder="e.g., 32746" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                </div>
                             </div>
+                            <button id="location-search-btn" class="w-full sm:w-auto bg-indigo-600 text-white font-semibold py-2 px-6 rounded-lg hover:bg-indigo-700 transition-colors flex items-center justify-center no-print">
+                                <span id="search-btn-text">Analyze</span>
+                                <svg id="search-btn-spinner" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                            </button>
                         </section>
-                        
+
                         <div id="location-loading-state" class="hidden h-64 flex flex-col items-center justify-center text-center">
                             <div class="loader"></div>
                             <p class="mt-4 text-slate-600 font-semibold">Analyzing location...</p>
@@ -352,7 +364,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div id="tab-content-kpi" class="hidden">
                     <!-- SOCIAL MEDIA KPI CONTENT -->
                     <div class="space-y-6">
@@ -613,6 +625,7 @@
                     </div>
                 </div>
 
+
             </main>
             
             <!-- Strategic Suggestions Section (visible for discount calculator) -->
@@ -668,6 +681,8 @@
                 }
                 attempt++;
             }
+             // Should not be reached if maxRetries > 0, but satisfy TS/lint
+             throw new Error("fetchWithBackoff failed after maximum retries.");
         }
 
         /**
@@ -681,16 +696,14 @@
                     await navigator.clipboard.writeText(text);
                     return true;
                 } else {
-                    // Fallback for non-secure contexts or older browsers
                     throw new Error('Using fallback');
                 }
             } catch (err) {
-                // Fallback using document.execCommand
                 try {
                     const textArea = document.createElement('textarea');
                     textArea.value = text;
                     textArea.style.position = 'fixed';
-                    textArea.style.left = '-9999px'; // Move off-screen
+                    textArea.style.left = '-9999px';
                     textArea.style.opacity = 0;
                     document.body.appendChild(textArea);
                     textArea.focus();
@@ -721,17 +734,25 @@
             // --- Password Check Logic ---
             const storedPassword = localStorage.getItem(PASSWORD_STORAGE_KEY) || DEFAULT_PASSWORD;
 
+            // Immediately check password on load
+            function checkInitialPassword() {
+                const enteredPassword = passwordInput.value;
+                 if (enteredPassword === storedPassword) {
+                    passwordOverlay.style.display = 'none';
+                    mainAppContent.classList.remove('hidden');
+                    initializeTabsAndCalculators();
+                 } else if (enteredPassword) { // Only show error if they tried entering something
+                     passwordError.classList.remove('hidden');
+                 }
+            }
+
             passwordForm.addEventListener('submit', (e) => {
                 e.preventDefault();
-                const enteredPassword = passwordInput.value;
-                if (enteredPassword === storedPassword) {
-                    passwordOverlay.style.display = 'none'; // Hide overlay
-                    mainAppContent.classList.remove('hidden'); // Show app
-                    initializeTabsAndCalculators(); // Initialize everything else *after* unlock
-                } else {
-                    passwordError.classList.remove('hidden'); // Show error
-                }
+                checkInitialPassword(); // Reuse the check logic on submit
             });
+
+            // Initial focus for easier entry
+            passwordInput.focus();
 
             // --- Initialize Tabs and Calculators (Function called after password success) ---
             function initializeTabsAndCalculators() {
@@ -742,7 +763,7 @@
                     kpi: document.getElementById('tab-btn-kpi'),
                     valuation: document.getElementById('tab-btn-valuation'),
                     social: document.getElementById('tab-btn-social'),
-                    settings: document.getElementById('tab-btn-settings'), // Added Settings
+                    settings: document.getElementById('tab-btn-settings'),
                 };
                 const tabContents = {
                     discount: document.getElementById('tab-content-discount'),
@@ -751,7 +772,7 @@
                     kpi: document.getElementById('tab-content-kpi'),
                     valuation: document.getElementById('tab-content-valuation'),
                     social: document.getElementById('tab-content-social'),
-                    settings: document.getElementById('tab-content-settings'), // Added Settings
+                    settings: document.getElementById('tab-content-settings'),
                 };
                 const suggestions = document.getElementById('strategic-suggestions');
 
@@ -759,7 +780,7 @@
                     Object.keys(tabButtons).forEach(key => {
                         const btn = tabButtons[key];
                         const content = tabContents[key];
-                        if (!btn || !content) return; // Skip if element doesn't exist
+                        if (!btn || !content) return;
                         if (key === activeTab) {
                             btn.classList.add('active');
                             content.classList.remove('hidden');
@@ -768,16 +789,15 @@
                             content.classList.add('hidden');
                         }
                     });
-                    suggestions.classList.toggle('hidden', activeTab !== 'discount');
+                     if(suggestions) suggestions.classList.toggle('hidden', activeTab !== 'discount');
                 }
 
-                tabButtons.discount?.addEventListener('click', () => switchTab('discount'));
-                tabButtons.irr?.addEventListener('click', () => switchTab('irr'));
-                tabButtons.location?.addEventListener('click', () => switchTab('location'));
-                tabButtons.kpi?.addEventListener('click', () => switchTab('kpi'));
-                tabButtons.valuation?.addEventListener('click', () => switchTab('valuation'));
-                tabButtons.social?.addEventListener('click', () => switchTab('social'));
-                tabButtons.settings?.addEventListener('click', () => switchTab('settings'));
+                Object.keys(tabButtons).forEach(key => {
+                    if (tabButtons[key]) {
+                        tabButtons[key].addEventListener('click', () => switchTab(key));
+                    }
+                });
+
 
                 // --- INITIALIZE CALCULATORS ---
                 setupDiscountCalculator();
@@ -789,7 +809,7 @@
                 setupSettings(); // Initialize Settings tab
             }
 
-            // --- Calculator Setup Functions (Keep as they were) ---
+            // --- Calculator Setup Functions ---
             function setupDiscountCalculator() {
                 let services = [{ id: Date.now() + 1, price: 50, discount: 0 }, { id: Date.now() + 2, price: 50, discount: 15 }];
                 const servicesContainer = document.getElementById('services-container');
@@ -819,7 +839,7 @@
 
                 const formatCurrency = (value) => value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
                 const render = () => {
-                    if (!servicesContainer || !individualDiscountsContainer) return; // Prevent errors if elements not found
+                    if (!servicesContainer || !individualDiscountsContainer) return;
                     servicesContainer.innerHTML = '';
                     individualDiscountsContainer.innerHTML = '';
                     services.forEach((service, index) => {
@@ -834,10 +854,8 @@
                     calculate();
                 };
                 const calculate = () => {
-                    // Check if all output elements exist before trying to update them
                     if (Object.values(outputs).some(el => !el) || !inputs.costValue || !inputs.costType || !inputs.overallDiscountNumber) return;
-
-                    const fullPrice = services.reduce((acc, s) => acc + s.price, 0);
+                    const fullPrice = services.reduce((acc, s) => acc + (parseFloat(s.price) || 0), 0); // Ensure prices are numbers
                     outputs.totalPriceDisplay.textContent = formatCurrency(fullPrice);
                     const costValue = parseFloat(inputs.costValue.value) || 0;
                     const costType = inputs.costType.value;
@@ -851,24 +869,24 @@
                     const s1NewPrice = fullPrice * (1 - overallDiscount / 100);
                     const s1NewProfit = s1NewPrice - cost;
                     const s1ProfitLost = baselineProfit - s1NewProfit;
-                    const s1ProfitOffset = baselineProfit > 0 ? (s1ProfitLost / baselineProfit) * 100 : 0;
+                    const s1ProfitOffset = baselineProfit !== 0 ? (s1ProfitLost / baselineProfit) * 100 : 0; // Avoid division by zero
                     outputs.s1NewPrice.textContent = formatCurrency(s1NewPrice);
                     outputs.s1NewProfit.textContent = formatCurrency(s1NewProfit);
-                    outputs.s1ProfitLost.textContent = `-${formatCurrency(Math.abs(s1ProfitLost))}`;
+                    outputs.s1ProfitLost.textContent = `${s1ProfitLost >= 0 ? '+' : '-'}${formatCurrency(Math.abs(s1ProfitLost))}`; // Show +/-
                     outputs.s1ProfitOffset.textContent = `${s1ProfitOffset.toFixed(1)}%`;
-                    const s2NewPrice = services.reduce((acc, s) => acc + (s.price * (1 - s.discount / 100)), 0);
+                    const s2NewPrice = services.reduce((acc, s) => acc + ((parseFloat(s.price) || 0) * (1 - (parseFloat(s.discount) || 0) / 100)), 0);
                     const s2NewProfit = s2NewPrice - cost;
                     const s2ProfitLost = baselineProfit - s2NewProfit;
-                    const s2ProfitOffset = baselineProfit > 0 ? (s2ProfitLost / baselineProfit) * 100 : 0;
+                    const s2ProfitOffset = baselineProfit !== 0 ? (s2ProfitLost / baselineProfit) * 100 : 0;
                     outputs.s2NewPrice.textContent = formatCurrency(s2NewPrice);
                     outputs.s2NewProfit.textContent = formatCurrency(s2NewProfit);
-                    outputs.s2ProfitLost.textContent = `-${formatCurrency(Math.abs(s2ProfitLost))}`;
+                    outputs.s2ProfitLost.textContent = `${s2ProfitLost >= 0 ? '+' : '-'}${formatCurrency(Math.abs(s2ProfitLost))}`;
                     outputs.s2ProfitOffset.textContent = `${s2ProfitOffset.toFixed(1)}%`;
                 };
                 addServiceBtn?.addEventListener('click', () => { services.push({ id: Date.now(), price: 0, discount: 0 }); render(); });
                 servicesContainer?.addEventListener('click', e => { if (e.target.closest('.remove-service-btn')) { services = services.filter(s => s.id !== Number(e.target.closest('.remove-service-btn').dataset.id)); render(); } });
                 servicesContainer?.addEventListener('input', e => { if (e.target.classList.contains('service-price-input')) { const service = services.find(s => s.id === Number(e.target.dataset.id)); if (service) { service.price = parseFloat(e.target.value) || 0; calculate(); } } });
-                individualDiscountsContainer?.addEventListener('input', e => { const service = services.find(s => s.id === Number(e.target.dataset.id)); if (service) { service.discount = parseFloat(e.target.value); if (e.target.type === 'range' && e.target.nextElementSibling) e.target.nextElementSibling.value = e.target.value; else if (e.target.type === 'number' && e.target.previousElementSibling) e.target.previousElementSibling.value = e.target.value; calculate(); } });
+                individualDiscountsContainer?.addEventListener('input', e => { const target = e.target; const service = services.find(s => s.id === Number(target.dataset.id)); if (service) { const value = parseFloat(target.value) || 0; service.discount = Math.max(0, Math.min(100, value)); if (target.type === 'range' && target.nextElementSibling) target.nextElementSibling.value = service.discount; else if (target.type === 'number' && target.previousElementSibling) target.previousElementSibling.value = service.discount; calculate(); } }); // Added bounds check
                 inputs.costType?.addEventListener('change', () => { if(outputs.costSymbol) outputs.costSymbol.textContent = inputs.costType.value === 'percentage' ? '%' : '$'; calculate(); });
                 inputs.costValue?.addEventListener('input', calculate);
                 inputs.overallDiscountRange?.addEventListener('input', () => { if(inputs.overallDiscountNumber) inputs.overallDiscountNumber.value = inputs.overallDiscountRange.value; calculate(); });
@@ -877,87 +895,19 @@
             }
 
             function setupIrrCalculator() {
-                const irrInputs = {
-                    initialInvestment: document.getElementById('initialInvestment'),
-                    projectionPeriod: document.getElementById('projectionPeriod'),
-                    exitValue: document.getElementById('exitValue'),
-                    year1Revenue: document.getElementById('year1Revenue'),
-                    revenueGrowth: document.getElementById('revenueGrowth'),
-                    year1Expenses: document.getElementById('year1Expenses'),
-                    expenseGrowth: document.getElementById('expenseGrowth'),
-                };
-                const calculateBtn = document.getElementById('calculate-irr-btn');
-                const irrResultEl = document.getElementById('irrResult');
-                const cashflowTableEl = document.getElementById('cashflow-table');
-                // Check if elements exist before proceeding
+                const irrInputs = { initialInvestment: document.getElementById('initialInvestment'), projectionPeriod: document.getElementById('projectionPeriod'), exitValue: document.getElementById('exitValue'), year1Revenue: document.getElementById('year1Revenue'), revenueGrowth: document.getElementById('revenueGrowth'), year1Expenses: document.getElementById('year1Expenses'), expenseGrowth: document.getElementById('expenseGrowth'), };
+                const calculateBtn = document.getElementById('calculate-irr-btn'); const irrResultEl = document.getElementById('irrResult'); const cashflowTableEl = document.getElementById('cashflow-table');
                 if (!calculateBtn || !irrResultEl || !cashflowTableEl || Object.values(irrInputs).some(el => !el)) return;
-
                 const formatCurrency = (value) => value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
                 const calculateNPV = (rate, cashflows) => cashflows.reduce((acc, val, i) => acc + val / Math.pow(1 + rate, i), 0);
-                const calculateIRR = (cashflows) => {
-                    const MAX_ITERATIONS = 100; const PRECISION = 1e-5;
-                    let lowerBound = -0.99, upperBound = 1.0;
-                    // Initial guess edge case check
-                    const npvLower = calculateNPV(lowerBound, cashflows);
-                    const npvUpper = calculateNPV(upperBound, cashflows);
-                    if (isNaN(npvLower) || isNaN(npvUpper) || npvLower * npvUpper >= 0) {
-                         // Attempt a wider range if simple bounds fail or produce NaN/Infinity
-                         lowerBound = -0.9999; upperBound = 5.0; // Wider range guess
-                         const npvLowerWider = calculateNPV(lowerBound, cashflows);
-                         const npvUpperWider = calculateNPV(upperBound, cashflows);
-                         if (isNaN(npvLowerWider) || isNaN(npvUpperWider) || npvLowerWider * npvUpperWider >= 0) {
-                             console.warn("IRR calculation might fail: NPVs at boundary guesses don't bracket zero.", {lower: npvLowerWider, upper: npvUpperWider});
-                             return null; // Cannot find a root within reasonable bounds
-                         }
-                    }
-
-                    for (let i = 0; i < MAX_ITERATIONS; i++) {
-                        let midRate = (lowerBound + upperBound) / 2;
-                        if (Math.abs(upperBound - lowerBound) < PRECISION) return midRate * 100; // Check proximity before calculating NPV
-                        let npvAtMid = calculateNPV(midRate, cashflows);
-                        if (isNaN(npvAtMid)) {
-                             console.warn("IRR iteration generated NaN for NPV at rate:", midRate);
-                             return null; // Stop if calculation breaks
-                        }
-                        if (Math.abs(npvAtMid) < PRECISION) return midRate * 100;
-                        if (calculateNPV(lowerBound, cashflows) * npvAtMid < 0) upperBound = midRate;
-                        else lowerBound = midRate;
-                    }
-                    console.warn("IRR calculation did not converge after max iterations.");
-                    return null; // Did not converge
-                };
-                calculateBtn.addEventListener('click', () => {
-                    const investment = -Math.abs(parseFloat(irrInputs.initialInvestment.value) || 0);
-                    const period = parseInt(irrInputs.projectionPeriod.value, 10);
-                    const exitValue = parseFloat(irrInputs.exitValue.value) || 0;
-                    let revenue = parseFloat(irrInputs.year1Revenue.value) || 0;
-                    const revGrowth = (parseFloat(irrInputs.revenueGrowth.value) || 0) / 100;
-                    let expenses = parseFloat(irrInputs.year1Expenses.value) || 0;
-                    const expGrowth = (parseFloat(irrInputs.expenseGrowth.value) || 0) / 100;
-                    const cashflows = [investment];
-                    let tableHTML = `<table class="w-full text-left"><thead class="border-b border-slate-300"><tr><th class="py-1">Year</th><th class="py-1">Revenue</th><th class="py-1">Expenses</th><th class="py-1 font-semibold">Net Cash Flow</th></tr></thead><tbody>`;
-                    for (let i = 1; i <= period; i++) {
-                        if (i > 1) { revenue *= (1 + revGrowth); expenses *= (1 + expGrowth); }
-                        let netCashFlow = revenue - expenses;
-                        if (i === period) netCashFlow += exitValue;
-                        cashflows.push(netCashFlow);
-                        tableHTML += `<tr><td class="py-1">${i}</td><td class="py-1">${formatCurrency(revenue)}</td><td class="py-1">${formatCurrency(expenses)}</td><td class="py-1 font-semibold">${formatCurrency(netCashFlow)}</td></tr>`;
-                    }
-                    tableHTML += `</tbody></table>`;
-                    cashflowTableEl.innerHTML = tableHTML;
-                    const irr = calculateIRR(cashflows);
-                    if (irr !== null && isFinite(irr)) {
-                        irrResultEl.textContent = `${irr.toFixed(2)}%`;
-                        irrResultEl.className = 'text-3xl font-bold text-indigo-600';
-                    } else {
-                        irrResultEl.textContent = 'N/A';
-                        irrResultEl.className = 'text-3xl font-bold text-red-500';
-                    }
-                });
+                const calculateIRR = (cashflows) => { const MAX_ITERATIONS = 100; const PRECISION = 1e-6; let lowerBound = -0.999, upperBound = 2.0; const npvLower = calculateNPV(lowerBound, cashflows); const npvUpper = calculateNPV(upperBound, cashflows); if (isNaN(npvLower) || isNaN(npvUpper) || npvLower * npvUpper >= 0) { console.warn("IRR bounds don't bracket zero."); return null; } for (let i = 0; i < MAX_ITERATIONS; i++) { let midRate = (lowerBound + upperBound) / 2; let npvAtMid = calculateNPV(midRate, cashflows); if (isNaN(npvAtMid)) return null; if (Math.abs(npvAtMid) < PRECISION || Math.abs(upperBound - lowerBound) < PRECISION) return midRate * 100; if (calculateNPV(lowerBound, cashflows) * npvAtMid < 0) upperBound = midRate; else lowerBound = midRate; } console.warn("IRR failed to converge."); return null; };
+                calculateBtn.addEventListener('click', () => { const investment = -Math.abs(parseFloat(irrInputs.initialInvestment.value) || 0); const period = parseInt(irrInputs.projectionPeriod.value, 10); const exitValue = parseFloat(irrInputs.exitValue.value) || 0; let revenue = parseFloat(irrInputs.year1Revenue.value) || 0; const revGrowth = (parseFloat(irrInputs.revenueGrowth.value) || 0) / 100; let expenses = parseFloat(irrInputs.year1Expenses.value) || 0; const expGrowth = (parseFloat(irrInputs.expenseGrowth.value) || 0) / 100; const cashflows = [investment]; let tableHTML = `<table class="w-full text-left"><thead class="border-b border-slate-300"><tr><th class="py-1 px-2">Year</th><th class="py-1 px-2">Revenue</th><th class="py-1 px-2">Expenses</th><th class="py-1 px-2 font-semibold">Net Cash Flow</th></tr></thead><tbody>`; for (let i = 1; i <= period; i++) { if (i > 1) { revenue *= (1 + revGrowth); expenses *= (1 + expGrowth); } let netCashFlow = revenue - expenses; if (i === period) netCashFlow += exitValue; cashflows.push(netCashFlow); tableHTML += `<tr><td class="py-1 px-2">${i}</td><td class="py-1 px-2">${formatCurrency(revenue)}</td><td class="py-1 px-2">${formatCurrency(expenses)}</td><td class="py-1 px-2 font-semibold">${formatCurrency(netCashFlow)}</td></tr>`; } tableHTML += `</tbody></table>`; cashflowTableEl.innerHTML = tableHTML; const irr = calculateIRR(cashflows); if (irr !== null && isFinite(irr)) { irrResultEl.textContent = `${irr.toFixed(2)}%`; irrResultEl.className = 'text-3xl font-bold text-indigo-600'; } else { irrResultEl.textContent = 'N/A'; irrResultEl.className = 'text-3xl font-bold text-red-500'; } });
             }
 
             function setupLocationAnalysis() {
-                const searchInput = document.getElementById('location-search-input');
+                const cityInput = document.getElementById('location-city-input');
+                const stateInput = document.getElementById('location-state-input');
+                const zipInput = document.getElementById('location-zip-input');
                 const searchBtn = document.getElementById('location-search-btn');
                 const searchBtnText = document.getElementById('search-btn-text');
                 const searchBtnSpinner = document.getElementById('search-btn-spinner');
@@ -965,87 +915,45 @@
                 const loadingState = document.getElementById('location-loading-state');
                 const errorState = document.getElementById('location-error-state');
                 const errorMessage = document.getElementById('location-error-message');
-                // Check if elements exist
-                if (!searchInput || !searchBtn || !contentContainer || !loadingState || !errorState) return;
+                if (!cityInput || !stateInput || !zipInput || !searchBtn || !contentContainer || !loadingState || !errorState) return;
 
-                const uiElements = {
-                    title: document.getElementById('location-analysis-title'),
-                    demographicsList: document.getElementById('demographics-list'),
-                    competitionLevel: document.getElementById('competition-level'),
-                    competitorsList: document.getElementById('competitors-list'),
-                    growthOpportunityText: document.getElementById('growth-opportunity-text'),
-                    scoreText: document.getElementById('location-score-text'),
-                    scoreBar: document.getElementById('location-score-bar'),
-                    scoringBreakdownList: document.getElementById('scoring-breakdown-list'),
-                    conclusionText: document.getElementById('conclusion-text'),
-                };
-                // Check uiElements too
+                const uiElements = { title: document.getElementById('location-analysis-title'), demographicsList: document.getElementById('demographics-list'), competitionLevel: document.getElementById('competition-level'), competitorsList: document.getElementById('competitors-list'), growthOpportunityText: document.getElementById('growth-opportunity-text'), scoreText: document.getElementById('location-score-text'), scoreBar: document.getElementById('location-score-bar'), scoringBreakdownList: document.getElementById('scoring-breakdown-list'), conclusionText: document.getElementById('conclusion-text'), };
                 if (Object.values(uiElements).some(el => !el)) return;
-                
-                // --- Cloud Function URL ---
-                // IMPORTANT: Replace this placeholder with your actual deployed Cloud Function URL
+
                 const CLOUD_FUNCTION_URL = 'https://us-central1-gen-lang-client-0400760132.cloudfunctions.net/geminiProxy';
 
-                async function callProxyFunction(location) {
-                    const payloadToFunction = {
-                        location: location,
-                        type: 'location'
-                    };
-
-                    // Use fetch or fetchWithBackoff
-                    const response = await fetch(CLOUD_FUNCTION_URL, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payloadToFunction)
-                    });
-
-                    if (!response.ok) {
-                        const errorText = await response.text();
-                        console.error(`Proxy function error (${response.status}): ${errorText}`);
-                        throw new Error(`Proxy function request failed with status ${response.status}`);
-                    }
-                    
-                    const jsonText = await response.text(); // Function returns JSON string
-                    try {
-                         return JSON.parse(jsonText); // Parse and return
-                    } catch(e) {
-                         console.error("Failed to parse JSON response from proxy:", jsonText, e);
-                         throw new Error("Invalid JSON received from proxy function.");
-                    }
+                async function callProxyFunction(locationString) {
+                    const payloadToFunction = { location: locationString, type: 'location' };
+                    const response = await fetch(CLOUD_FUNCTION_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payloadToFunction) });
+                    if (!response.ok) { const errorText = await response.text(); console.error(`Proxy function error (${response.status}): ${errorText}`); throw new Error(`Proxy function request failed with status ${response.status}`); }
+                    const jsonText = await response.text();
+                    try { return JSON.parse(jsonText); }
+                    catch(e) { console.error("Failed to parse JSON response from proxy:", jsonText, e); throw new Error("Invalid JSON received from proxy function."); }
                 }
 
-                function updateUI(data) {
-                    uiElements.title.textContent = `Location Analysis: ${data.locationName || 'N/A'}`;
-                    
-                    uiElements.demographicsList.innerHTML = `
-                        <li class="flex justify-between"><span>Population:</span> <span class="font-semibold text-slate-800">${data.demographics?.population || 'N/A'}</span></li>
-                        <li class="flex justify-between"><span>Median Household Income:</span> <span class="font-semibold text-slate-800">${data.demographics?.medianHouseholdIncome || 'N/A'}</span></li>
-                        <li class="flex justify-between"><span>${data.demographics?.keyEthnicity?.name || 'Key Ethnicity'}:</span> <span class="font-semibold text-slate-800">${data.demographics?.keyEthnicity?.percentage || 'N/A'}</span></li>
-                        <li class="flex justify-between"><span>Daytime Population:</span> <span class="font-semibold text-slate-800">${data.demographics?.daytimePopulation || 'N/A'}</span></li>
-                    `;
-
+                function updateUI(data) { /* ... (keep updateUI function as is) ... */
+                     uiElements.title.textContent = `Location Analysis: ${data.locationName || 'N/A'}`;
+                    uiElements.demographicsList.innerHTML = ` <li class="flex justify-between"><span>Population:</span> <span class="font-semibold text-slate-800">${data.demographics?.population || 'N/A'}</span></li> <li class="flex justify-between"><span>Median Household Income:</span> <span class="font-semibold text-slate-800">${data.demographics?.medianHouseholdIncome || 'N/A'}</span></li> <li class="flex justify-between"><span>${data.demographics?.keyEthnicity?.name || 'Key Ethnicity'}:</span> <span class="font-semibold text-slate-800">${data.demographics?.keyEthnicity?.percentage || 'N/A'}</span></li> <li class="flex justify-between"><span>Daytime Population:</span> <span class="font-semibold text-slate-800">${data.demographics?.daytimePopulation || 'N/A'}</span></li> `;
                     uiElements.competitionLevel.textContent = `Competition is considered ${data.competition?.level || 'N/A'}. Key competitors include:`;
                     uiElements.competitorsList.innerHTML = data.competition?.competitors?.map(c => `<li>${c}</li>`).join('') || '<li>N/A</li>';
-                    
                     uiElements.growthOpportunityText.textContent = data.growthAndOpportunity || 'N/A';
-                    
-                    const score = parseFloat(data.overallScore || 0).toFixed(1);
-                    uiElements.scoreText.textContent = score;
-                    uiElements.scoreBar.style.width = `${Math.max(0, Math.min(100, score * 10))}%`; // Ensure width is between 0-100%
-
-                    uiElements.scoringBreakdownList.innerHTML = data.scoringBreakdown?.map(item => {
-                        let icon = `<b class="text-orange-500">~</b>`; // Default to Neutral
-                        if (item.verdict === 'Positive') icon = `<b class="text-green-600">✓</b>`;
-                        else if (item.verdict === 'Negative') icon = `<b class="text-red-600">✗</b>`;
-                        return `<p class="text-sm text-slate-700">${icon} ${item.point || 'N/A'}</p>`;
-                    }).join('') || '<p>N/A</p>';
-
+                    const score = parseFloat(data.overallScore || 0).toFixed(1); uiElements.scoreText.textContent = score; uiElements.scoreBar.style.width = `${Math.max(0, Math.min(100, score * 10))}%`;
+                    uiElements.scoringBreakdownList.innerHTML = data.scoringBreakdown?.map(item => { let icon = `<b class="text-orange-500">~</b>`; if (item.verdict === 'Positive') icon = `<b class="text-green-600">✓</b>`; else if (item.verdict === 'Negative') icon = `<b class="text-red-600">✗</b>`; return `<p class="text-sm text-slate-700">${icon} ${item.point || 'N/A'}</p>`; }).join('') || '<p>N/A</p>';
                     uiElements.conclusionText.textContent = data.conclusion || 'N/A';
                 }
 
                 async function handleSearch() {
-                    const location = searchInput.value;
-                    if (!location) return;
+                    const city = cityInput.value.trim();
+                    const state = stateInput.value.trim();
+                    const zip = zipInput.value.trim();
+                    if (!city || !state) {
+                        errorMessage.textContent = 'Please enter at least a City and State.';
+                        errorState.classList.remove('hidden');
+                        contentContainer.classList.add('hidden');
+                        return;
+                    }
+                    // Construct location string - include zip if provided
+                    const locationString = `${city}, ${state}${zip ? ' ' + zip : ''}`;
 
                     searchBtn.disabled = true;
                     if(searchBtnText) searchBtnText.classList.add('hidden');
@@ -1055,12 +963,12 @@
                     loadingState.classList.remove('hidden');
 
                     try {
-                        const analysisData = await callProxyFunction(location);
+                        const analysisData = await callProxyFunction(locationString);
                         updateUI(analysisData);
                         contentContainer.classList.remove('hidden');
                     } catch (error) {
                         console.error("Location analysis failed:", error);
-                        errorMessage.textContent = `Could not retrieve analysis for "${location}". Please check the function logs or try again. Details: ${error.message}`;
+                        errorMessage.textContent = `Could not retrieve analysis for "${locationString}". Please check function logs or try again. Details: ${error.message}`;
                         errorState.classList.remove('hidden');
                     } finally {
                         searchBtn.disabled = false;
@@ -1071,247 +979,49 @@
                 }
 
                 searchBtn.addEventListener('click', handleSearch);
-                searchInput.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') handleSearch();
+                // Allow enter key press in any of the three inputs to trigger search
+                [cityInput, stateInput, zipInput].forEach(input => {
+                     input.addEventListener('keypress', (e) => {
+                         if (e.key === 'Enter') handleSearch();
+                     });
                 });
 
-                // Initial load
-                searchInput.value = "Lake Mary, FL";
-                handleSearch();
+                // Initial load with default values (already set in HTML)
+                handleSearch(); // Run analysis for default values on load
             }
 
             function setupKpiDashboard() {
-                const kpiInputs = {
-                    impressions: document.getElementById('kpi-impressions'),
-                    reach: document.getElementById('kpi-reach'),
-                    clicks: document.getElementById('kpi-clicks'),
-                    engagement: document.getElementById('kpi-engagement'),
-                    spend: document.getElementById('kpi-spend'),
-                };
-                const kpiOutputs = {
-                    engagementRate: document.getElementById('kpi-engagement-rate'),
-                    ctr: document.getElementById('kpi-ctr'),
-                    cpc: document.getElementById('kpi-cpc'),
-                    cpm: document.getElementById('kpi-cpm'),
-                };
-                // Check if elements exist
+                const kpiInputs = { impressions: document.getElementById('kpi-impressions'), reach: document.getElementById('kpi-reach'), clicks: document.getElementById('kpi-clicks'), engagement: document.getElementById('kpi-engagement'), spend: document.getElementById('kpi-spend'), };
+                const kpiOutputs = { engagementRate: document.getElementById('kpi-engagement-rate'), ctr: document.getElementById('kpi-ctr'), cpc: document.getElementById('kpi-cpc'), cpm: document.getElementById('kpi-cpm'), };
                 if (Object.values(kpiInputs).some(el => !el) || Object.values(kpiOutputs).some(el => !el)) return;
-
                 const formatCurrency = (value) => value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
-                function calculateKpis() {
-                    const impressions = parseFloat(kpiInputs.impressions.value) || 0;
-                    const engagement = parseFloat(kpiInputs.engagement.value) || 0;
-                    const clicks = parseFloat(kpiInputs.clicks.value) || 0;
-                    const spend = parseFloat(kpiInputs.spend.value) || 0;
-                    const engagementRate = impressions > 0 ? (engagement / impressions) * 100 : 0;
-                    const ctr = impressions > 0 ? (clicks / impressions) * 100 : 0;
-                    const cpc = clicks > 0 ? spend / clicks : 0;
-                    const cpm = impressions > 0 ? (spend / impressions) * 1000 : 0;
-                    kpiOutputs.engagementRate.textContent = `${engagementRate.toFixed(2)}%`;
-                    kpiOutputs.ctr.textContent = `${ctr.toFixed(2)}%`;
-                    kpiOutputs.cpc.textContent = formatCurrency(cpc);
-                    kpiOutputs.cpm.textContent = formatCurrency(cpm);
-                }
+                function calculateKpis() { const impressions = parseFloat(kpiInputs.impressions.value) || 0; const engagement = parseFloat(kpiInputs.engagement.value) || 0; const clicks = parseFloat(kpiInputs.clicks.value) || 0; const spend = parseFloat(kpiInputs.spend.value) || 0; const engagementRate = impressions > 0 ? (engagement / impressions) * 100 : 0; const ctr = impressions > 0 ? (clicks / impressions) * 100 : 0; const cpc = clicks > 0 ? spend / clicks : 0; const cpm = impressions > 0 ? (spend / impressions) * 1000 : 0; kpiOutputs.engagementRate.textContent = `${engagementRate.toFixed(2)}%`; kpiOutputs.ctr.textContent = `${ctr.toFixed(2)}%`; kpiOutputs.cpc.textContent = formatCurrency(cpc); kpiOutputs.cpm.textContent = formatCurrency(cpm); }
                 Object.values(kpiInputs).forEach(input => input.addEventListener('input', calculateKpis));
-                calculateKpis(); // Initial calculation
+                calculateKpis();
             }
             
             function setupValuationCalculator() {
                 const printBtn = document.getElementById('print-valuation-pdf');
-                const valInputs = {
-                    locationSelector: document.getElementById('location-type-selector'),
-                    annualRevenue: document.getElementById('val-annual-revenue'),
-                    rent: document.getElementById('val-rent'),
-                    supplies: document.getElementById('val-supplies'),
-                    utilities: document.getElementById('val-utilities'),
-                    processorFee: document.getElementById('val-processor-fee'),
-                    commission: document.getElementById('val-commission'),
-                };
-                const valOutputs = {
-                    totalValuation: document.getElementById('total-valuation'),
-                    locationBase: document.getElementById('val-location-base'),
-                    annualCashflow: document.getElementById('val-annual-cashflow'),
-                    incomeValuation: document.getElementById('val-income-valuation'),
-                    fastValuation: document.getElementById('val-fast-valuation'),
-                };
-                 // Check if elements exist
+                const valInputs = { locationSelector: document.getElementById('location-type-selector'), annualRevenue: document.getElementById('val-annual-revenue'), rent: document.getElementById('val-rent'), supplies: document.getElementById('val-supplies'), utilities: document.getElementById('val-utilities'), processorFee: document.getElementById('val-processor-fee'), commission: document.getElementById('val-commission'), };
+                const valOutputs = { totalValuation: document.getElementById('total-valuation'), locationBase: document.getElementById('val-location-base'), annualCashflow: document.getElementById('val-annual-cashflow'), incomeValuation: document.getElementById('val-income-valuation'), fastValuation: document.getElementById('val-fast-valuation'), };
                 if (!printBtn || Object.values(valInputs).some(el => !el) || Object.values(valOutputs).some(el => !el)) return;
-
                 const formatCurrency = (value) => value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
-                function calculateValuation() {
-                    const locationBasePrice = parseFloat(valInputs.locationSelector.querySelector('input:checked').value);
-                    const annualRevenue = parseFloat(valInputs.annualRevenue.value) || 0;
-                    const monthlyRent = parseFloat(valInputs.rent.value) || 0;
-                    const monthlySupplies = parseFloat(valInputs.supplies.value) || 0;
-                    const monthlyUtilities = parseFloat(valInputs.utilities.value) || 0;
-                    const processorFeePercent = (parseFloat(valInputs.processorFee.value) || 0) / 100;
-                    const commissionPercent = (parseFloat(valInputs.commission.value) || 0) / 100;
-                    const annualFixedExpenses = (monthlyRent + monthlySupplies + monthlyUtilities) * 12;
-                    const annualVariableExpenses = annualRevenue * (processorFeePercent + commissionPercent);
-                    const totalAnnualExpenses = annualFixedExpenses + annualVariableExpenses;
-                    const annualCashFlow = annualRevenue - totalAnnualExpenses;
-                    const cashOnCashValuation = annualCashFlow > 0 ? (annualCashFlow / 0.85) : 0; // Avoid negative valuation from income
-                    const fastValuation = (annualRevenue / 12) * 3;
-                    const totalValuation = locationBasePrice + cashOnCashValuation;
-                    
-                    valOutputs.locationBase.textContent = formatCurrency(locationBasePrice);
-                    valOutputs.annualCashflow.textContent = formatCurrency(annualCashFlow);
-                    valOutputs.incomeValuation.textContent = formatCurrency(cashOnCashValuation);
-                    valOutputs.fastValuation.textContent = formatCurrency(fastValuation);
-                    valOutputs.totalValuation.textContent = formatCurrency(totalValuation);
-                }
-                
-                function generatePDF() {
-                    const { jsPDF } = window.jspdf;
-                    const doc = new jsPDF();
-                    const today = new Date().toLocaleDateString('en-US');
-                    // Get current values
-                    const locationBasePrice = parseFloat(valInputs.locationSelector.querySelector('input:checked').value);
-                    const annualRevenue = parseFloat(valInputs.annualRevenue.value) || 0;
-                    const monthlyRent = parseFloat(valInputs.rent.value) || 0;
-                    const monthlySupplies = parseFloat(valInputs.supplies.value) || 0;
-                    const monthlyUtilities = parseFloat(valInputs.utilities.value) || 0;
-                    const processorFeePercent = parseFloat(valInputs.processorFee.value) || 0;
-                    const commissionPercent = parseFloat(valInputs.commission.value) || 0;
-                    const annualRent = monthlyRent * 12;
-                    const annualSupplies = monthlySupplies * 12;
-                    const annualUtilities = monthlyUtilities * 12;
-                    const annualProcessorFees = annualRevenue * (processorFeePercent / 100);
-                    const annualCommission = annualRevenue * (commissionPercent / 100);
-                    const annualCashFlow = parseFloat(valOutputs.annualCashflow.textContent.replace(/[^0-9.-]+/g,""));
-                    const totalValuation = valOutputs.totalValuation.textContent;
-                    const incomeValuation = valOutputs.incomeValuation.textContent;
-
-                    // Build PDF
-                    doc.setFontSize(22); doc.text("Nail Salon Valuation Report", 105, 20, { align: 'center' });
-                    doc.setFontSize(11); doc.setTextColor(100); doc.text(`Generated on: ${today}`, 105, 28, { align: 'center' });
-                    doc.setFontSize(16); doc.setTextColor(0); doc.text("Valuation Summary", 14, 45);
-                    doc.setLineWidth(0.5); doc.line(14, 47, 196, 47);
-                    doc.setFontSize(12); doc.text("Total Estimated Valuation:", 14, 55);
-                    doc.setFont(undefined, 'bold'); doc.text(totalValuation, 196, 55, { align: 'right' });
-                    doc.setFont(undefined, 'normal'); doc.text("Location Base Value:", 14, 62);
-                    doc.text(formatCurrency(locationBasePrice), 196, 62, { align: 'right' });
-                    doc.text("Income Valuation (85% CoC):", 14, 69); doc.text(incomeValuation, 196, 69, { align: 'right' });
-                    doc.setFontSize(16); doc.text("Key Financials", 14, 85); doc.line(14, 87, 196, 87);
-                    doc.setFontSize(12); doc.text("Annual Revenue:", 14, 95); doc.text(formatCurrency(annualRevenue), 196, 95, { align: 'right' });
-                    doc.text("Annual Cash Flow:", 14, 102); doc.setFont(undefined, 'bold'); doc.text(formatCurrency(annualCashFlow), 196, 102, { align: 'right' });
-                    doc.setFontSize(16); doc.setFont(undefined, 'normal'); doc.text("Annual Expense Breakdown", 14, 118); doc.line(14, 120, 196, 120);
-                    doc.setFontSize(12); doc.text(`Commission (${commissionPercent}%):`, 14, 128); doc.text(formatCurrency(annualCommission), 196, 128, { align: 'right' });
-                    doc.text("Rent:", 14, 135); doc.text(formatCurrency(annualRent), 196, 135, { align: 'right' });
-                    doc.text("Supplies:", 14, 142); doc.text(formatCurrency(annualSupplies), 196, 142, { align: 'right' });
-                    doc.text("Utilities:", 14, 149); doc.text(formatCurrency(annualUtilities), 196, 149, { align: 'right' });
-                    doc.text(`Processor Fees (${processorFeePercent}%):`, 14, 156); doc.text(formatCurrency(annualProcessorFees), 196, 156, { align: 'right' });
-                    doc.setFontSize(10); doc.setTextColor(150); doc.text("Report generated by Business Calculators App.", 105, 280, { align: 'center' });
-                    doc.save('Nail-Salon-Valuation-Report.pdf');
-                }
+                function calculateValuation() { const locationBasePrice = parseFloat(valInputs.locationSelector.querySelector('input:checked').value); const annualRevenue = parseFloat(valInputs.annualRevenue.value) || 0; const monthlyRent = parseFloat(valInputs.rent.value) || 0; const monthlySupplies = parseFloat(valInputs.supplies.value) || 0; const monthlyUtilities = parseFloat(valInputs.utilities.value) || 0; const processorFeePercent = (parseFloat(valInputs.processorFee.value) || 0) / 100; const commissionPercent = (parseFloat(valInputs.commission.value) || 0) / 100; const annualFixedExpenses = (monthlyRent + monthlySupplies + monthlyUtilities) * 12; const annualVariableExpenses = annualRevenue * (processorFeePercent + commissionPercent); const totalAnnualExpenses = annualFixedExpenses + annualVariableExpenses; const annualCashFlow = annualRevenue - totalAnnualExpenses; const cashOnCashValuation = annualCashFlow > 0 ? (annualCashFlow / 0.85) : 0; const fastValuation = (annualRevenue / 12) * 3; const totalValuation = locationBasePrice + cashOnCashValuation; valOutputs.locationBase.textContent = formatCurrency(locationBasePrice); valOutputs.annualCashflow.textContent = formatCurrency(annualCashFlow); valOutputs.incomeValuation.textContent = formatCurrency(cashOnCashValuation); valOutputs.fastValuation.textContent = formatCurrency(fastValuation); valOutputs.totalValuation.textContent = formatCurrency(totalValuation); }
+                function generatePDF() { const { jsPDF } = window.jspdf; const doc = new jsPDF(); const today = new Date().toLocaleDateString('en-US'); const locationBasePrice = parseFloat(valInputs.locationSelector.querySelector('input:checked').value); const annualRevenue = parseFloat(valInputs.annualRevenue.value) || 0; const monthlyRent = parseFloat(valInputs.rent.value) || 0; const monthlySupplies = parseFloat(valInputs.supplies.value) || 0; const monthlyUtilities = parseFloat(valInputs.utilities.value) || 0; const processorFeePercent = parseFloat(valInputs.processorFee.value) || 0; const commissionPercent = parseFloat(valInputs.commission.value) || 0; const annualRent = monthlyRent * 12; const annualSupplies = monthlySupplies * 12; const annualUtilities = monthlyUtilities * 12; const annualProcessorFees = annualRevenue * (processorFeePercent / 100); const annualCommission = annualRevenue * (commissionPercent / 100); const annualCashFlow = parseFloat(valOutputs.annualCashflow.textContent.replace(/[^0-9.-]+/g,"")); const totalValuation = valOutputs.totalValuation.textContent; const incomeValuation = valOutputs.incomeValuation.textContent; doc.setFontSize(22); doc.text("Nail Salon Valuation Report", 105, 20, { align: 'center' }); doc.setFontSize(11); doc.setTextColor(100); doc.text(`Generated on: ${today}`, 105, 28, { align: 'center' }); doc.setFontSize(16); doc.setTextColor(0); doc.text("Valuation Summary", 14, 45); doc.setLineWidth(0.5); doc.line(14, 47, 196, 47); doc.setFontSize(12); doc.text("Total Estimated Valuation:", 14, 55); doc.setFont(undefined, 'bold'); doc.text(totalValuation, 196, 55, { align: 'right' }); doc.setFont(undefined, 'normal'); doc.text("Location Base Value:", 14, 62); doc.text(formatCurrency(locationBasePrice), 196, 62, { align: 'right' }); doc.text("Income Valuation (85% CoC):", 14, 69); doc.text(incomeValuation, 196, 69, { align: 'right' }); doc.setFontSize(16); doc.text("Key Financials", 14, 85); doc.line(14, 87, 196, 87); doc.setFontSize(12); doc.text("Annual Revenue:", 14, 95); doc.text(formatCurrency(annualRevenue), 196, 95, { align: 'right' }); doc.text("Annual Cash Flow:", 14, 102); doc.setFont(undefined, 'bold'); doc.text(formatCurrency(annualCashFlow), 196, 102, { align: 'right' }); doc.setFontSize(16); doc.setFont(undefined, 'normal'); doc.text("Annual Expense Breakdown", 14, 118); doc.line(14, 120, 196, 120); doc.setFontSize(12); doc.text(`Commission (${commissionPercent}%):`, 14, 128); doc.text(formatCurrency(annualCommission), 196, 128, { align: 'right' }); doc.text("Rent:", 14, 135); doc.text(formatCurrency(annualRent), 196, 135, { align: 'right' }); doc.text("Supplies:", 14, 142); doc.text(formatCurrency(annualSupplies), 196, 142, { align: 'right' }); doc.text("Utilities:", 14, 149); doc.text(formatCurrency(annualUtilities), 196, 149, { align: 'right' }); doc.text(`Processor Fees (${processorFeePercent}%):`, 14, 156); doc.text(formatCurrency(annualProcessorFees), 196, 156, { align: 'right' }); doc.setFontSize(10); doc.setTextColor(150); doc.text("Report generated by Business Calculators App.", 105, 280, { align: 'center' }); doc.save('Nail-Salon-Valuation-Report.pdf'); }
                 Object.values(valInputs).forEach(inputElement => inputElement.addEventListener('input', calculateValuation));
                 printBtn.addEventListener('click', generatePDF);
-                calculateValuation(); // Initial calculation
+                calculateValuation();
             }
             
             function setupSocialMediaAssistant() {
-                // --- Cloud Function URL ---
-                // IMPORTANT: Replace this placeholder with your actual deployed Cloud Function URL
                 const CLOUD_FUNCTION_URL = 'https://us-central1-gen-lang-client-0400760132.cloudfunctions.net/geminiProxy';
-
-                // --- DOM Elements ---
-                const socialForm = document.getElementById('social-form');
-                const postTopicInput = document.getElementById('social-post-topic');
-                const generateBtn = document.getElementById('social-generate-btn');
-                const btnText = document.getElementById('social-btn-text');
-                const btnSpinner = document.getElementById('social-btn-spinner');
-                const errorContainer = document.getElementById('social-error');
-                const resultsContainer = document.getElementById('social-results');
-                const captionResultContainer = document.getElementById('social-caption-result');
-                const captionOutput = document.getElementById('social-caption-output');
-                const hashtagsResultContainer = document.getElementById('social-hashtags-result');
-                const hashtagsOutput = document.getElementById('social-hashtags-output');
-                const ideasDropdownContainer = document.getElementById('social-ideas-dropdown');
-                const copyBtns = document.querySelectorAll('.social-copy-btn');
-                // Check if elements exist
+                const socialForm = document.getElementById('social-form'); const postTopicInput = document.getElementById('social-post-topic'); const generateBtn = document.getElementById('social-generate-btn'); const btnText = document.getElementById('social-btn-text'); const btnSpinner = document.getElementById('social-btn-spinner'); const errorContainer = document.getElementById('social-error'); const resultsContainer = document.getElementById('social-results'); const captionResultContainer = document.getElementById('social-caption-result'); const captionOutput = document.getElementById('social-caption-output'); const hashtagsResultContainer = document.getElementById('social-hashtags-result'); const hashtagsOutput = document.getElementById('social-hashtags-output'); const ideasDropdownContainer = document.getElementById('social-ideas-dropdown'); const copyBtns = document.querySelectorAll('.social-copy-btn');
                 if (!socialForm || !postTopicInput || !generateBtn || !ideasDropdownContainer) return;
-
-                const ideasDropdown = ideasDropdownContainer.querySelector('div'); // Get the actual div for adding buttons
-                if (!ideasDropdown) return;
-
-
+                const ideasDropdown = ideasDropdownContainer.querySelector('div'); if (!ideasDropdown) return;
                 const postIdeas = ["Fresh manicure (classic)","Gel manicure (long-lasting)","Elaborate nail art design","Relaxing pedicure","Seasonal colors (e.g., fall, summer)","Spa day package","Special promotion or discount",];
-                // Populate Post Ideas
-                ideasDropdown.innerHTML = ''; // Clear existing before adding
-                postIdeas.forEach(idea => {
-                    const button = document.createElement('button');
-                    button.type = 'button';
-                    button.className = 'block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100';
-                    button.setAttribute('role', 'menuitem');
-                    button.textContent = idea;
-                    button.onclick = () => { postTopicInput.value = idea; document.activeElement.blur(); };
-                    ideasDropdown.appendChild(button);
-                });
-
-                socialForm.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    const postTopic = postTopicInput.value.trim();
-                    if (!postTopic) { errorContainer.textContent = "Please enter a topic for the post."; errorContainer.classList.remove('hidden'); return; }
-
-                    generateBtn.disabled = true;
-                    if (btnText) btnText.classList.add('hidden');
-                    if (btnSpinner) btnSpinner.classList.remove('hidden');
-                    errorContainer.classList.add('hidden');
-                    resultsContainer.classList.add('hidden');
-
-                    const payloadToFunction = { userQuery: `Generate an Instagram caption and a list of 10-15 relevant hashtags for a post about: "${postTopic}".`, type: 'social' };
-
-                    try {
-                        const response = await fetch(CLOUD_FUNCTION_URL, {
-                            method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payloadToFunction)
-                        });
-                        if (!response.ok) { const errorText = await response.text(); throw new Error(`Proxy function request failed with status ${response.status}: ${errorText}`); }
-                        const jsonText = await response.text();
-                        const parsedJson = JSON.parse(jsonText);
-                        
-                        if (captionOutput) captionOutput.textContent = parsedJson.caption;
-                        if (hashtagsOutput) hashtagsOutput.textContent = parsedJson.hashtags?.join(' ') || '';
-                        if (captionResultContainer) captionResultContainer.classList.toggle('hidden', !parsedJson.caption);
-                        if (hashtagsResultContainer) hashtagsResultContainer.classList.toggle('hidden', !parsedJson.hashtags?.length);
-                        resultsContainer.classList.remove('hidden');
-                    } catch (err) {
-                        console.error("Error calling proxy function:", err);
-                        errorContainer.textContent = "Sorry, we couldn't generate content at this time. Please try again later.";
-                        errorContainer.classList.remove('hidden');
-                    } finally {
-                        generateBtn.disabled = false;
-                        if (btnText) btnText.classList.remove('hidden');
-                        if (btnSpinner) btnSpinner.classList.add('hidden');
-                    }
-                });
-
-                copyBtns.forEach(btn => {
-                    btn.addEventListener('click', async () => {
-                        const type = btn.dataset.type;
-                        const textToCopy = (type === 'caption' && captionOutput) ? captionOutput.textContent : (hashtagsOutput ? hashtagsOutput.textContent : '');
-                        const success = await copyToClipboard(textToCopy);
-                        if (success) {
-                            const copyText = btn.querySelector('.copy-text');
-                            const copyIcon = btn.querySelector('.copy-icon');
-                            const checkIcon = btn.querySelector('.check-icon');
-                            if (copyText) copyText.textContent = 'Copied!';
-                            if (copyIcon) copyIcon.classList.add('hidden');
-                            if (checkIcon) checkIcon.classList.remove('hidden');
-                            setTimeout(() => {
-                                if (copyText) copyText.textContent = 'Copy';
-                                if (copyIcon) copyIcon.classList.remove('hidden');
-                                if (checkIcon) checkIcon.classList.add('hidden');
-                            }, 2000);
-                        } else {
-                            // Simple feedback if copy fails
-                             const feedback = document.createElement('span');
-                             feedback.textContent = ' Copy Failed!';
-                             feedback.className = 'text-red-500 text-xs ml-1';
-                             btn.appendChild(feedback);
-                             setTimeout(() => btn.removeChild(feedback), 2000);
-                        }
-                    });
-                });
+                ideasDropdown.innerHTML = ''; postIdeas.forEach(idea => { const button = document.createElement('button'); button.type = 'button'; button.className = 'block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100'; button.setAttribute('role', 'menuitem'); button.textContent = idea; button.onclick = () => { postTopicInput.value = idea; document.activeElement.blur(); }; ideasDropdown.appendChild(button); });
+                socialForm.addEventListener('submit', async (e) => { e.preventDefault(); const postTopic = postTopicInput.value.trim(); if (!postTopic) { if(errorContainer){ errorContainer.textContent = "Please enter a topic."; errorContainer.classList.remove('hidden');} return; } generateBtn.disabled = true; if (btnText) btnText.classList.add('hidden'); if (btnSpinner) btnSpinner.classList.remove('hidden'); if(errorContainer) errorContainer.classList.add('hidden'); if(resultsContainer) resultsContainer.classList.add('hidden'); const payloadToFunction = { userQuery: `Generate an Instagram caption and a list of 10-15 relevant hashtags for a post about: "${postTopic}".`, type: 'social' }; try { const response = await fetch(CLOUD_FUNCTION_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payloadToFunction) }); if (!response.ok) { const errorText = await response.text(); throw new Error(`Proxy function request failed with status ${response.status}: ${errorText}`); } const jsonText = await response.text(); const parsedJson = JSON.parse(jsonText); if (captionOutput) captionOutput.textContent = parsedJson.caption || ''; if (hashtagsOutput) hashtagsOutput.textContent = parsedJson.hashtags?.join(' ') || ''; if (captionResultContainer) captionResultContainer.classList.toggle('hidden', !parsedJson.caption); if (hashtagsResultContainer) hashtagsResultContainer.classList.toggle('hidden', !parsedJson.hashtags?.length); if(resultsContainer) resultsContainer.classList.remove('hidden'); } catch (err) { console.error("Error calling proxy function:", err); if(errorContainer){ errorContainer.textContent = "Sorry, couldn't generate content. Please try again."; errorContainer.classList.remove('hidden');} } finally { generateBtn.disabled = false; if (btnText) btnText.classList.remove('hidden'); if (btnSpinner) btnSpinner.classList.add('hidden'); } });
+                copyBtns.forEach(btn => { btn.addEventListener('click', async () => { const type = btn.dataset.type; const textToCopy = (type === 'caption' && captionOutput) ? captionOutput.textContent : (hashtagsOutput ? hashtagsOutput.textContent : ''); const success = await copyToClipboard(textToCopy); if (success) { const copyText = btn.querySelector('.copy-text'); const copyIcon = btn.querySelector('.copy-icon'); const checkIcon = btn.querySelector('.check-icon'); if (copyText) copyText.textContent = 'Copied!'; if (copyIcon) copyIcon.classList.add('hidden'); if (checkIcon) checkIcon.classList.remove('hidden'); setTimeout(() => { if (copyText) copyText.textContent = 'Copy'; if (copyIcon) copyIcon.classList.remove('hidden'); if (checkIcon) checkIcon.classList.add('hidden'); }, 2000); } else { const feedback = document.createElement('span'); feedback.textContent = ' Copy Failed!'; feedback.className = 'text-red-500 text-xs ml-1'; btn.appendChild(feedback); setTimeout(() => btn.removeChild(feedback), 2000); } }); });
             }
 
             function setupSettings() {
@@ -1320,47 +1030,11 @@
                 const savePasswordBtn = document.getElementById('save-password-btn');
                 const passwordSaveFeedback = document.getElementById('password-save-feedback');
                 const showHideBtn = document.getElementById('show-hide-password');
-                // Check if elements exist
                 if (!currentPasswordInput || !newPasswordInput || !savePasswordBtn || !passwordSaveFeedback || !showHideBtn) return;
-
-
-                function loadCurrentPassword() {
-                     currentPasswordInput.value = localStorage.getItem(PASSWORD_STORAGE_KEY) || DEFAULT_PASSWORD;
-                }
-
-                 // Load initially and make sure it's masked
-                loadCurrentPassword();
-                currentPasswordInput.type = 'password';
-                showHideBtn.textContent = 'Show';
-
-
-                showHideBtn.addEventListener('click', () => {
-                    if (currentPasswordInput.type === 'password') {
-                        currentPasswordInput.type = 'text';
-                        showHideBtn.textContent = 'Hide';
-                    } else {
-                        currentPasswordInput.type = 'password';
-                        showHideBtn.textContent = 'Show';
-                    }
-                });
-
-                savePasswordBtn.addEventListener('click', () => {
-                    const newPassword = newPasswordInput.value;
-                    if (newPassword && newPassword.length >= 3) { // Basic validation
-                        localStorage.setItem(PASSWORD_STORAGE_KEY, newPassword);
-                        loadCurrentPassword(); // Update displayed password (masked)
-                        currentPasswordInput.type = 'password'; // Ensure it's masked after saving
-                        showHideBtn.textContent = 'Show';
-                        newPasswordInput.value = ''; // Clear the input field
-                        passwordSaveFeedback.textContent = 'Access code saved successfully!';
-                        passwordSaveFeedback.className = 'text-sm text-green-600 text-center mt-2';
-                    } else {
-                        passwordSaveFeedback.textContent = 'New code must be at least 3 characters long.';
-                        passwordSaveFeedback.className = 'text-sm text-red-600 text-center mt-2';
-                    }
-                    // Clear feedback message after a few seconds
-                    setTimeout(() => { passwordSaveFeedback.textContent = ''; }, 3000);
-                });
+                function loadCurrentPassword() { currentPasswordInput.value = localStorage.getItem(PASSWORD_STORAGE_KEY) || DEFAULT_PASSWORD; }
+                loadCurrentPassword(); currentPasswordInput.type = 'password'; showHideBtn.textContent = 'Show';
+                showHideBtn.addEventListener('click', () => { if (currentPasswordInput.type === 'password') { currentPasswordInput.type = 'text'; showHideBtn.textContent = 'Hide'; } else { currentPasswordInput.type = 'password'; showHideBtn.textContent = 'Show'; } });
+                savePasswordBtn.addEventListener('click', () => { const newPassword = newPasswordInput.value; if (newPassword && newPassword.length >= 3) { localStorage.setItem(PASSWORD_STORAGE_KEY, newPassword); loadCurrentPassword(); currentPasswordInput.type = 'password'; showHideBtn.textContent = 'Show'; newPasswordInput.value = ''; passwordSaveFeedback.textContent = 'Access code saved successfully!'; passwordSaveFeedback.className = 'text-sm text-green-600 text-center mt-2'; } else { passwordSaveFeedback.textContent = 'New code must be at least 3 characters long.'; passwordSaveFeedback.className = 'text-sm text-red-600 text-center mt-2'; } setTimeout(() => { passwordSaveFeedback.textContent = ''; }, 3000); });
             }
 
         }); // End DOMContentLoaded
