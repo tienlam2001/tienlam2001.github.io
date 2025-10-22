@@ -70,6 +70,19 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        
+        /* Styles for Social Media Assistant */
+        .social-dropdown {
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.15s ease-in-out;
+        }
+        .social-dropdown-trigger:focus-within + .social-dropdown,
+        .social-dropdown:hover {
+            opacity: 1;
+            visibility: visible;
+        }
+
         @media print {
             body * {
                 visibility: hidden;
@@ -93,7 +106,7 @@
 
     <div class="container mx-auto p-4 md:p-8 max-w-4xl">
         <!-- Header -->
-        <header class="text-center mb-8">
+        <header class="text-center mb-8 no-print">
             <h1 class="text-3xl md:text-4xl font-bold text-slate-900">Business Calculators</h1>
             <p class="mt-2 text-slate-600">Tools for smart pricing and investment decisions.</p>
         </header>
@@ -108,6 +121,7 @@
                     <button id="tab-btn-location" class="tab-btn text-slate-500 hover:text-slate-700 whitespace-nowrap py-3 px-1 border-b-2 font-semibold text-sm border-transparent">Location Analysis</button>
                     <button id="tab-btn-kpi" class="tab-btn text-slate-500 hover:text-slate-700 whitespace-nowrap py-3 px-1 border-b-2 font-semibold text-sm border-transparent">Social Media KPI</button>
                     <button id="tab-btn-valuation" class="tab-btn text-slate-500 hover:text-slate-700 whitespace-nowrap py-3 px-1 border-b-2 font-semibold text-sm border-transparent">Valuation</button>
+                    <button id="tab-btn-social" class="tab-btn text-slate-500 hover:text-slate-700 whitespace-nowrap py-3 px-1 border-b-2 font-semibold text-sm border-transparent">Social Media Assistant</button>
                 </nav>
             </div>
 
@@ -468,6 +482,87 @@
                     </section>
                 </div>
             </div>
+
+            <div id="tab-content-social" class="hidden">
+                <!-- SOCIAL MEDIA ASSISTANT CONTENT -->
+                <div class="w-full max-w-2xl mx-auto">
+                    <!-- Header -->
+                    <header class="text-center mb-6">
+                        <h1 class="text-3xl font-bold text-gray-800">Ecco Nails & Spa</h1>
+                        <p class="text-lg text-gray-500">Social Media Assistant</p>
+                    </header>
+
+                    <!-- Input Form -->
+                    <form id="social-form">
+                        <div class="mb-4">
+                            <label for="social-post-topic" class="block text-sm font-medium text-gray-700 mb-2">
+                                What is your post about?
+                            </label>
+                            <textarea id="social-post-topic" rows="3" placeholder="e.g., 'A beautiful new set of fall-themed nail art' or 'Our relaxing deluxe pedicure'" class="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-pink-300 focus:border-pink-300 transition-all"></textarea>
+                        </div>
+
+                        <!-- Post Ideas Dropdown -->
+                        <div class="relative mb-4 social-dropdown-trigger">
+                            <button type="button" class="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-300">
+                                Need ideas?
+                                <svg class="-mr-1 ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                            </button>
+                            <div id="social-ideas-dropdown" class="social-dropdown absolute z-10 left-0 mt-2 w-full rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                                <div class="py-1" role="menu" aria-orientation="vertical">
+                                    <!-- Ideas will be populated by JS -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Generate Button -->
+                        <button type="submit" id="social-generate-btn" class="w-full flex items-center justify-center bg-pink-500 text-white font-bold py-3 px-4 rounded-md shadow-lg hover:bg-pink-600 transition-all duration-200 ease-in-out disabled:bg-gray-400 disabled:cursor-not-allowed">
+                            <span id="social-btn-text">
+                                <svg class="inline-block mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4.00001C15 4.00001 16.7341 5.31481 18 7.00001C19.2659 8.6852 20 11.5 20 11.5C20 11.5 18.2341 12.8148 17 14.5C15.7659 16.1852 15 19 15 19M9 4.00001C9 4.00001 7.26589 5.31481 6 7.00001C4.73411 8.6852 4 11.5 4 11.5C4 11.5 5.76589 12.8148 7 14.5C8.23411 16.1852 9 19 9 19M12 2V22" /></svg>
+                                Generate Content
+                            </span>
+                            <span id="social-btn-spinner" class="hidden">
+                                <svg class="inline-block mr-2 h-5 w-5 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                Generating...
+                            </span>
+                        </button>
+                    </form>
+
+                    <!-- Error Message -->
+                    <div id="social-error" class="hidden mt-4 p-3 bg-red-100 border border-red-300 text-red-700 rounded-md text-center"></div>
+
+                    <!-- Results -->
+                    <div id="social-results" class="hidden mt-8 border-t border-gray-200 pt-6">
+                        <!-- Caption Output -->
+                        <div id="social-caption-result" class="mb-6">
+                            <div class="flex justify-between items-center mb-2">
+                                <h3 class="text-lg font-semibold text-gray-800">Generated Caption</h3>
+                                <button data-type="caption" class="social-copy-btn flex items-center text-sm text-pink-500 hover:text-pink-700 transition-colors">
+                                    <svg class="copy-icon mr-1 h-4 w-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                    <svg class="check-icon hidden mr-1 h-4 w-4 text-green-500" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>
+                                    <span class="copy-text">Copy</span>
+                                </button>
+                            </div>
+                            <div id="social-caption-output" class="p-4 bg-gray-50 border border-gray-200 rounded-md whitespace-pre-wrap font-serif text-gray-700"></div>
+                        </div>
+
+                        <!-- Hashtags Output -->
+                        <div id="social-hashtags-result">
+                            <div class="flex justify-between items-center mb-2">
+                                <h3 class="text-lg font-semibold text-gray-800">Generated Hashtags</h3>
+                                <button data-type="hashtags" class="social-copy-btn flex items-center text-sm text-pink-500 hover:text-pink-700 transition-colors">
+                                    <svg class="copy-icon mr-1 h-4 w-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                    <svg class="check-icon hidden mr-1 h-4 w-4 text-green-500" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>
+                                    <span class="copy-text">Copy</span>
+                                </button>
+                            </div>
+                            <div class="p-4 bg-gray-50 border border-gray-200 rounded-md">
+                                <p id="social-hashtags-output" class="text-gray-600 leading-relaxed"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
         </main>
         
         <!-- Strategic Suggestions Section (visible for discount calculator) -->
@@ -489,6 +584,75 @@
     </div>
 
     <script>
+        // --- UTILITY FUNCTIONS (Global Scope) ---
+
+        /**
+         * Implements exponential backoff for fetching from the API.
+         * @param {function} fetchFn - The fetch function to retry.
+         * @param {number} maxRetries - Maximum number of retries.
+         * @param {number} baseDelay - Base delay in ms.
+         * @returns {Promise<Response>}
+         */
+        async function fetchWithBackoff(fetchFn, maxRetries = 5, baseDelay = 1000) {
+            let attempt = 0;
+            while (attempt < maxRetries) {
+                try {
+                    const response = await fetchFn();
+                    if (response.ok) {
+                        return response;
+                    }
+                    // Don't retry on client errors (4xx), but do on server errors (5xx) or rate limiting (429)
+                    if (response.status >= 400 && response.status < 500 && response.status !== 429) {
+                        console.error(`Client error: ${response.status}. Not retrying.`);
+                        return response; // Return the error response
+                    }
+                    // Throw an error to trigger retry
+                    throw new Error(`API request failed with status ${response.status}`);
+                } catch (error) {
+                    if (attempt === maxRetries - 1) {
+                        console.error("Max retries reached. Failing.");
+                        throw error; // Re-throw last error
+                    }
+                    const delay = baseDelay * Math.pow(2, attempt) + Math.random() * 1000;
+                    // Do not log retry attempts as errors in the console
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                }
+                attempt++;
+            }
+            throw new Error("Max retries reached without success."); // Should not happen if loop terminates correctly
+        }
+
+        /**
+         * Copies text to the clipboard.
+         * Uses document.execCommand as a fallback for iFrame environments.
+         * @param {string} text - The text to copy.
+         * @returns {Promise<boolean>} - True if successful, false otherwise.
+         */
+        async function copyToClipboard(text) {
+            try {
+                await navigator.clipboard.writeText(text);
+                return true;
+            } catch (err) {
+                // Fallback for iFrames
+                try {
+                    const textArea = document.createElement('textarea');
+                    textArea.value = text;
+                    textArea.style.position = 'fixed'; // Avoid scrolling
+                    textArea.style.opacity = 0;
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+                    const successful = document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    return successful;
+                } catch (fallbackErr) {
+                    console.error('Fallback copy failed:', fallbackErr);
+                    return false;
+                }
+            }
+        }
+
+
         document.addEventListener('DOMContentLoaded', () => {
             // --- GENERAL TAB HANDLING ---
             const tabButtons = {
@@ -497,6 +661,7 @@
                 location: document.getElementById('tab-btn-location'),
                 kpi: document.getElementById('tab-btn-kpi'),
                 valuation: document.getElementById('tab-btn-valuation'),
+                social: document.getElementById('tab-btn-social'),
             };
             const tabContents = {
                 discount: document.getElementById('tab-content-discount'),
@@ -504,6 +669,7 @@
                 location: document.getElementById('tab-content-location'),
                 kpi: document.getElementById('tab-content-kpi'),
                 valuation: document.getElementById('tab-content-valuation'),
+                social: document.getElementById('tab-content-social'),
             };
             const suggestions = document.getElementById('strategic-suggestions');
 
@@ -527,6 +693,7 @@
             tabButtons.location.addEventListener('click', () => switchTab('location'));
             tabButtons.kpi.addEventListener('click', () => switchTab('kpi'));
             tabButtons.valuation.addEventListener('click', () => switchTab('valuation'));
+            tabButtons.social.addEventListener('click', () => switchTab('social'));
 
 
             // --- INITIALIZE CALCULATORS ---
@@ -535,6 +702,7 @@
             setupLocationAnalysis();
             setupKpiDashboard();
             setupValuationCalculator();
+            setupSocialMediaAssistant();
         });
         
         function setupDiscountCalculator() {
@@ -638,15 +806,44 @@
                 const MAX_ITERATIONS = 100;
                 const PRECISION = 1e-5;
                 let lowerBound = -0.99, upperBound = 1.0;
-                if (calculateNPV(lowerBound, cashflows) * calculateNPV(upperBound, cashflows) >= 0) return null;
+                // Add a check to prevent errors if NPVs have the same sign
+                const npvLower = calculateNPV(lowerBound, cashflows);
+                const npvUpper = calculateNPV(upperBound, cashflows);
+                if (isNaN(npvLower) || isNaN(npvUpper) || npvLower * npvUpper >= 0) {
+                     console.warn("IRR calculation might fail: NPVs at bounds have the same sign or are NaN.");
+                     // Attempt a default guess or return null early
+                     if (cashflows.length > 1 && cashflows[0] < 0 && cashflows.slice(1).reduce((a, b) => a + b, 0) > Math.abs(cashflows[0])) {
+                         // Simple check: If total future cashflows exceed investment, IRR might be positive.
+                         // This is a heuristic and not guaranteed.
+                     } else {
+                         return null; // Early exit if initial checks fail
+                     }
+                }
+
                 for (let i = 0; i < MAX_ITERATIONS; i++) {
                     let midRate = (lowerBound + upperBound) / 2;
+                     if (Math.abs(upperBound - lowerBound) < PRECISION) { // Check for convergence by rate difference
+                        return midRate * 100;
+                     }
                     let npvAtMid = calculateNPV(midRate, cashflows);
-                    if (Math.abs(npvAtMid) < PRECISION) return midRate * 100;
-                    if (calculateNPV(lowerBound, cashflows) * npvAtMid < 0) upperBound = midRate;
-                    else lowerBound = midRate;
+
+                    if (isNaN(npvAtMid)) return null; // Exit if NPV calculation results in NaN
+
+                    if (Math.abs(npvAtMid) < PRECISION) {
+                        return midRate * 100;
+                    }
+                    
+                    let npvAtLower = calculateNPV(lowerBound, cashflows); // Recalculate if needed, or use stored value
+                     if (isNaN(npvAtLower)) return null;
+
+                    if (npvAtLower * npvAtMid < 0) {
+                        upperBound = midRate;
+                    } else {
+                        lowerBound = midRate;
+                    }
                 }
-                return null;
+                 console.warn("IRR calculation did not converge within max iterations.");
+                return null; // Return null if no solution found within iterations
             };
             calculateBtn.addEventListener('click', () => {
                 const investment = -Math.abs(parseFloat(irrInputs.initialInvestment.value) || 0);
@@ -656,17 +853,51 @@
                 const revGrowth = (parseFloat(irrInputs.revenueGrowth.value) || 0) / 100;
                 let expenses = parseFloat(irrInputs.year1Expenses.value) || 0;
                 const expGrowth = (parseFloat(irrInputs.expenseGrowth.value) || 0) / 100;
+                
+                // Validate inputs
+                if (isNaN(investment) || isNaN(period) || period <= 0 || isNaN(exitValue) || isNaN(revenue) || isNaN(revGrowth) || isNaN(expenses) || isNaN(expGrowth)) {
+                    irrResultEl.textContent = 'Invalid Input';
+                    irrResultEl.className = 'text-3xl font-bold text-red-500';
+                    cashflowTableEl.innerHTML = '<p class="italic text-red-500">Please check your input values.</p>';
+                    return;
+                }
+
                 const cashflows = [investment];
                 let tableHTML = `<table class="w-full text-left"><thead class="border-b border-slate-300"><tr><th class="py-1">Year</th><th class="py-1">Revenue</th><th class="py-1">Expenses</th><th class="py-1 font-semibold">Net Cash Flow</th></tr></thead><tbody>`;
+                
+                let currentRevenue = revenue;
+                let currentExpenses = expenses;
+
                 for (let i = 1; i <= period; i++) {
-                    if (i > 1) { revenue *= (1 + revGrowth); expenses *= (1 + expGrowth); }
-                    let netCashFlow = revenue - expenses;
-                    if (i === period) netCashFlow += exitValue;
+                    if (i > 1) { 
+                        currentRevenue *= (1 + revGrowth); 
+                        currentExpenses *= (1 + expGrowth); 
+                    }
+                    let netCashFlow = currentRevenue - currentExpenses;
+                    if (i === period) {
+                        netCashFlow += exitValue;
+                    }
+                    // Prevent extremely large or small numbers causing issues
+                    if (!isFinite(netCashFlow)) {
+                         irrResultEl.textContent = 'Calculation Error';
+                         irrResultEl.className = 'text-3xl font-bold text-red-500';
+                         cashflowTableEl.innerHTML = '<p class="italic text-red-500">Cash flow calculation resulted in non-finite number.</p>';
+                         return;
+                    }
                     cashflows.push(netCashFlow);
-                    tableHTML += `<tr><td class="py-1">${i}</td><td class="py-1">${formatCurrency(revenue)}</td><td class="py-1">${formatCurrency(expenses)}</td><td class="py-1 font-semibold">${formatCurrency(netCashFlow)}</td></tr>`;
+                    tableHTML += `<tr><td class="py-1">${i}</td><td class="py-1">${formatCurrency(currentRevenue)}</td><td class="py-1">${formatCurrency(currentExpenses)}</td><td class="py-1 font-semibold">${formatCurrency(netCashFlow)}</td></tr>`;
                 }
                 tableHTML += `</tbody></table>`;
                 cashflowTableEl.innerHTML = tableHTML;
+                
+                // Add a check for valid cashflows array before calculating IRR
+                 if (cashflows.length <= 1) {
+                     irrResultEl.textContent = 'N/A';
+                     irrResultEl.className = 'text-3xl font-bold text-red-500';
+                     return;
+                 }
+
+
                 const irr = calculateIRR(cashflows);
                 if (irr !== null && isFinite(irr)) {
                     irrResultEl.textContent = `${irr.toFixed(2)}%`;
@@ -674,11 +905,22 @@
                 } else {
                     irrResultEl.textContent = 'N/A';
                     irrResultEl.className = 'text-3xl font-bold text-red-500';
+                     // Add more context if IRR is null
+                     if (cashflows.length > 1 && cashflows[0] < 0 && cashflows.slice(1).reduce((a, b) => a + b, 0) <= Math.abs(cashflows[0])) {
+                          cashflowTableEl.innerHTML += '<p class="italic text-orange-500 mt-2">Note: IRR could not be calculated, possibly because projected returns do not exceed the initial investment.</p>';
+                     } else {
+                          cashflowTableEl.innerHTML += '<p class="italic text-orange-500 mt-2">Note: IRR calculation did not converge. Check cash flow projections.</p>';
+                     }
                 }
             });
+             // Initial calculation on load
+             calculateBtn.click();
         }
 
         function setupLocationAnalysis() {
+            // Placeholder for Cloud Function URL - Replace with your actual deployed URL
+            const CLOUD_FUNCTION_URL = 'YOUR_CLOUD_FUNCTION_URL_HERE'; // <--- PASTE YOUR FUNCTION URL HERE
+
             const searchInput = document.getElementById('location-search-input');
             const searchBtn = document.getElementById('location-search-btn');
             const searchBtnText = document.getElementById('search-btn-text');
@@ -700,123 +942,84 @@
                 conclusionText: document.getElementById('conclusion-text'),
             };
             
-            async function callGemini(location) {
-                // The API key is intentionally left blank. The execution environment 
-                // will automatically handle authentication.
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent`;
+            async function callProxyFunction(location) {
+                 if (CLOUD_FUNCTION_URL === 'YOUR_CLOUD_FUNCTION_URL_HERE') {
+                    console.error("Cloud Function URL is not set. Please replace the placeholder.");
+                    throw new Error("Cloud Function URL not configured in the frontend code.");
+                 }
 
-                const schema = {
-                    type: "OBJECT",
-                    properties: {
-                        "locationName": { "type": "STRING" },
-                        "demographics": {
-                            type: "OBJECT",
-                            properties: {
-                                "population": { "type": "STRING" },
-                                "medianHouseholdIncome": { "type": "STRING" },
-                                "keyEthnicity": { 
-                                    type: "OBJECT",
-                                    properties: {
-                                        "name": { "type": "STRING" },
-                                        "percentage": { "type": "STRING" }
-                                    },
-                                     required: ["name", "percentage"]
-                                },
-                                "daytimePopulation": { "type": "STRING" }
-                            },
-                             required: ["population", "medianHouseholdIncome", "keyEthnicity", "daytimePopulation"]
-                        },
-                        "competition": {
-                            type: "OBJECT",
-                            properties: {
-                                "level": { "type": "STRING" },
-                                "competitors": { "type": "ARRAY", "items": { "type": "STRING" } }
-                            },
-                            required: ["level", "competitors"]
-                        },
-                        "growthAndOpportunity": { "type": "STRING" },
-                        "overallScore": { "type": "NUMBER" },
-                        "scoringBreakdown": {
-                            "type": "ARRAY",
-                            "items": {
-                                "type": "OBJECT",
-                                "properties": {
-                                    "point": { "type": "STRING" },
-                                    "verdict": { "type": "STRING", "enum": ["Positive", "Neutral", "Negative"] }
-                                },
-                                required: ["point", "verdict"]
-                            }
-                        },
-                        "conclusion": { "type": "STRING" }
-                    },
-                     required: ["locationName", "demographics", "competition", "growthAndOpportunity", "overallScore", "scoringBreakdown", "conclusion"]
+                const payloadToFunction = {
+                    location: location,
+                    type: 'location' // Specify the type for the Cloud Function
                 };
 
-                 const systemPrompt = `Analyze ${location} as a potential location for a new high-end nail salon. Provide your analysis in a JSON format. The JSON object must follow the provided schema. Base your analysis on real-world data for demographics, local competition, and economic growth trends.`;
+                // Use fetchWithBackoff OR just fetch directly to your function
+                const response = await fetchWithBackoff(() => 
+                    fetch(CLOUD_FUNCTION_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payloadToFunction)
+                    })
+                );
 
-                const payload = {
-                    contents: [{ parts: [{ text: `Analyze ${location}` }] }],
-                    tools: [{ "google_search": {} }],
-                    systemInstruction: { parts: [{ text: systemPrompt }] },
-                    generationConfig: {
-                        responseMimeType: "application/json",
-                        responseSchema: schema,
-                    }
-                };
-                
-                // The API call is made without an explicit key in the URL,
-                // allowing the environment to inject it securely.
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                
                 if (!response.ok) {
-                    throw new Error(`API call failed with status ${response.status}`);
+                    const errorText = await response.text();
+                    console.error(`Proxy function error (${response.status}): ${errorText}`);
+                    throw new Error(`Proxy function request failed with status ${response.status}`);
                 }
                 
-                const result = await response.json();
-                const jsonText = result.candidates?.[0]?.content?.parts?.[0]?.text;
-                if (!jsonText) {
-                    throw new Error("Invalid response structure from API.");
-                }
-                return JSON.parse(jsonText);
+                const jsonText = await response.text(); // Function returns JSON string
+                 try {
+                     return JSON.parse(jsonText); // Parse and return
+                 } catch (parseError) {
+                     console.error("Failed to parse JSON response from proxy:", jsonText);
+                     throw new Error("Invalid JSON received from proxy function.");
+                 }
             }
 
             function updateUI(data) {
-                uiElements.title.textContent = `Location Analysis: ${data.locationName}`;
+                 // Make sure data and nested properties exist before accessing them
+                uiElements.title.textContent = `Location Analysis: ${data?.locationName || 'N/A'}`;
                 
+                const demographics = data?.demographics || {};
+                const keyEthnicity = demographics.keyEthnicity || {};
                 uiElements.demographicsList.innerHTML = `
-                    <li class="flex justify-between"><span>Population:</span> <span class="font-semibold text-slate-800">${data.demographics.population}</span></li>
-                    <li class="flex justify-between"><span>Median Household Income:</span> <span class="font-semibold text-slate-800">${data.demographics.medianHouseholdIncome}</span></li>
-                    <li class="flex justify-between"><span>${data.demographics.keyEthnicity.name}:</span> <span class="font-semibold text-slate-800">${data.demographics.keyEthnicity.percentage}</span></li>
-                    <li class="flex justify-between"><span>Daytime Population:</span> <span class="font-semibold text-slate-800">${data.demographics.daytimePopulation}</span></li>
+                    <li class="flex justify-between"><span>Population:</span> <span class="font-semibold text-slate-800">${demographics.population || 'N/A'}</span></li>
+                    <li class="flex justify-between"><span>Median Household Income:</span> <span class="font-semibold text-slate-800">${demographics.medianHouseholdIncome || 'N/A'}</span></li>
+                    <li class="flex justify-between"><span>${keyEthnicity.name || 'Key Ethnicity'}:</span> <span class="font-semibold text-slate-800">${keyEthnicity.percentage || 'N/A'}</span></li>
+                    <li class="flex justify-between"><span>Daytime Population:</span> <span class="font-semibold text-slate-800">${demographics.daytimePopulation || 'N/A'}</span></li>
                 `;
 
-                uiElements.competitionLevel.textContent = `Competition is considered ${data.competition.level}. Key competitors include:`;
-                uiElements.competitorsList.innerHTML = data.competition.competitors.map(c => `<li>${c}</li>`).join('');
+                const competition = data?.competition || {};
+                uiElements.competitionLevel.textContent = `Competition is considered ${competition.level || 'N/A'}. Key competitors include:`;
+                uiElements.competitorsList.innerHTML = (competition.competitors || []).map(c => `<li>${c}</li>`).join('') || '<li>None listed</li>';
                 
-                uiElements.growthOpportunityText.textContent = data.growthAndOpportunity;
+                uiElements.growthOpportunityText.textContent = data?.growthAndOpportunity || 'No analysis available.';
                 
-                const score = parseFloat(data.overallScore).toFixed(1);
+                const score = parseFloat(data?.overallScore || 0).toFixed(1);
                 uiElements.scoreText.textContent = score;
                 uiElements.scoreBar.style.width = `${score * 10}%`;
 
-                uiElements.scoringBreakdownList.innerHTML = data.scoringBreakdown.map(item => {
+                uiElements.scoringBreakdownList.innerHTML = (data?.scoringBreakdown || []).map(item => {
                     let icon;
                     if (item.verdict === 'Positive') icon = `<b class="text-green-600">✓</b>`;
                     else if (item.verdict === 'Negative') icon = `<b class="text-red-600">✗</b>`;
                     else icon = `<b class="text-orange-500">~</b>`;
-                    return `<p class="text-sm text-slate-700">${icon} ${item.point}</p>`;
-                }).join('');
+                    return `<p class="text-sm text-slate-700">${icon} ${item.point || 'N/A'}</p>`;
+                }).join('') || '<p class="text-sm text-slate-500">No breakdown available.</p>';
 
-                uiElements.conclusionText.textContent = data.conclusion;
+                uiElements.conclusionText.textContent = data?.conclusion || 'No conclusion available.';
             }
 
             async function handleSearch() {
                 const location = searchInput.value;
                 if (!location) return;
+
+                 if (CLOUD_FUNCTION_URL === 'YOUR_CLOUD_FUNCTION_URL_HERE') {
+                    errorMessage.textContent = `Cloud Function URL not configured. Please update the placeholder in the code.`;
+                    errorState.classList.remove('hidden');
+                    return; // Stop execution if URL is not set
+                 }
 
                 // Set loading UI
                 searchBtn.disabled = true;
@@ -827,12 +1030,17 @@
                 loadingState.classList.remove('hidden');
 
                 try {
-                    const analysisData = await callGemini(location);
+                    const analysisData = await callProxyFunction(location); // Call the proxy
                     updateUI(analysisData);
                     contentContainer.classList.remove('hidden');
                 } catch (error) {
                     console.error("Location analysis failed:", error);
-                    errorMessage.textContent = `Could not retrieve analysis for "${location}". Please try a different location or check the console for details.`;
+                     // Provide more specific error message based on the error type if possible
+                     if (error.message.includes("Cloud Function URL not configured")) {
+                          errorMessage.textContent = error.message;
+                     } else {
+                        errorMessage.textContent = `Could not retrieve analysis for "${location}". Please check the function logs or try again. Details: ${error.message}`;
+                     }
                     errorState.classList.remove('hidden');
                 } finally {
                     // Reset UI
@@ -852,7 +1060,16 @@
 
             // Initial load with default data
              searchInput.value = "Lake Mary, FL";
-             handleSearch();
+             // Don't auto-search on load if URL might be placeholder
+             // handleSearch(); 
+             // Instead, prompt user or wait for button click if URL is placeholder
+             if (CLOUD_FUNCTION_URL === 'YOUR_CLOUD_FUNCTION_URL_HERE') {
+                 errorMessage.textContent = `Please configure the Cloud Function URL in the code to enable Location Analysis.`;
+                 errorState.classList.remove('hidden');
+                 contentContainer.classList.add('hidden'); // Hide content area initially
+             } else {
+                  handleSearch(); // Auto-search if URL seems configured
+             }
         }
 
         function setupKpiDashboard() {
@@ -932,25 +1149,45 @@
                 const totalAnnualExpenses = annualFixedExpenses + annualVariableExpenses;
 
                 const annualCashFlow = annualRevenue - totalAnnualExpenses;
+                 // Ensure cash flow is not negative for income valuation if desired
+                 const positiveCashFlow = Math.max(0, annualCashFlow); 
 
-                const cashOnCashValuation = annualCashFlow / 0.85; // Based on 85% CoC target
+                const cashOnCashValuation = positiveCashFlow / 0.85; // Based on 85% CoC target using non-negative cash flow
                 const fastValuation = (annualRevenue / 12) * 3;
-                const totalValuation = locationBasePrice + cashOnCashValuation;
+                // Total valuation should reflect potentially negative cash flow impact if CoC method is primary
+                const incomeValuationComponent = annualCashFlow / 0.85; // Use actual cash flow here for total
+
+                const totalValuation = locationBasePrice + incomeValuationComponent;
                 
                 valOutputs.locationBase.textContent = formatCurrency(locationBasePrice);
                 valOutputs.annualCashflow.textContent = formatCurrency(annualCashFlow);
-                valOutputs.incomeValuation.textContent = formatCurrency(cashOnCashValuation);
+                 // Display income valuation based on positive cash flow or 0
+                valOutputs.incomeValuation.textContent = formatCurrency(cashOnCashValuation); 
                 valOutputs.fastValuation.textContent = formatCurrency(fastValuation);
                 valOutputs.totalValuation.textContent = formatCurrency(totalValuation);
             }
             
             function generatePDF() {
+                // Ensure jsPDF is loaded
+                 if (typeof window.jspdf === 'undefined' || typeof window.jspdf.jsPDF === 'undefined') {
+                     console.error("jsPDF library not loaded.");
+                     // Optionally show an error to the user
+                     const tempAlert = document.createElement('div');
+                     tempAlert.textContent = 'Error generating PDF: jsPDF library missing.';
+                     tempAlert.className = 'fixed top-5 right-5 bg-red-500 text-white p-3 rounded-md shadow-lg';
+                     document.body.appendChild(tempAlert);
+                     setTimeout(() => document.body.removeChild(tempAlert), 3000);
+                     return;
+                 }
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF();
                 const today = new Date().toLocaleDateString('en-US');
                 
                 // --- Get all current values ---
-                const locationBasePrice = parseFloat(valInputs.locationSelector.querySelector('input:checked').value);
+                const locationRadio = valInputs.locationSelector.querySelector('input:checked');
+                 const locationTypeText = locationRadio ? locationRadio.closest('label').textContent.trim() : 'N/A';
+                const locationBasePrice = parseFloat(locationRadio ? locationRadio.value : 0);
+
                 const annualRevenue = parseFloat(valInputs.annualRevenue.value) || 0;
                 const monthlyRent = parseFloat(valInputs.rent.value) || 0;
                 const monthlySupplies = parseFloat(valInputs.supplies.value) || 0;
@@ -964,83 +1201,283 @@
                 const annualProcessorFees = annualRevenue * (processorFeePercent / 100);
                 const annualCommission = annualRevenue * (commissionPercent / 100);
                 
-                const annualCashFlow = parseFloat(valOutputs.annualCashflow.textContent.replace(/[^0-9.-]+/g,""));
-                const totalValuation = valOutputs.totalValuation.textContent;
-                const incomeValuation = valOutputs.incomeValuation.textContent;
+                 // Recalculate just in case UI hasn't updated instantly
+                 const annualFixedExpenses = (monthlyRent + monthlySupplies + monthlyUtilities) * 12;
+                 const annualVariableExpenses = annualRevenue * ((processorFeePercent / 100) + (commissionPercent / 100));
+                 const totalAnnualExpenses = annualFixedExpenses + annualVariableExpenses;
+                 const annualCashFlow = annualRevenue - totalAnnualExpenses;
+                 const incomeValuation = (annualCashFlow > 0 ? annualCashFlow / 0.85 : 0); // Use recalculated positive flow
+                 const totalValuation = locationBasePrice + (annualCashFlow / 0.85); // Use actual flow impact for total
 
                 // --- Build PDF Document ---
+                 const leftMargin = 14;
+                 const rightMargin = 196;
+                 let yPos = 20;
+
                 doc.setFontSize(22);
-                doc.text("Nail Salon Valuation Report", 105, 20, { align: 'center' });
+                 doc.text("Nail Salon Valuation Report", doc.internal.pageSize.getWidth() / 2, yPos, { align: 'center' });
+                 yPos += 8;
                 doc.setFontSize(11);
                 doc.setTextColor(100);
-                doc.text(`Generated on: ${today}`, 105, 28, { align: 'center' });
+                 doc.text(`Generated on: ${today}`, doc.internal.pageSize.getWidth() / 2, yPos, { align: 'center' });
+                 yPos += 17;
 
                 // Summary Section
                 doc.setFontSize(16);
                 doc.setTextColor(0);
-                doc.text("Valuation Summary", 14, 45);
+                 doc.text("Valuation Summary", leftMargin, yPos);
+                 yPos += 2;
                 doc.setLineWidth(0.5);
-                doc.line(14, 47, 196, 47); 
+                 doc.line(leftMargin, yPos, rightMargin, yPos); 
+                 yPos += 8;
                 
                 doc.setFontSize(12);
-                doc.text("Total Estimated Valuation:", 14, 55);
+                 doc.text("Total Estimated Valuation:", leftMargin, yPos);
                 doc.setFont(undefined, 'bold');
-                doc.text(totalValuation, 196, 55, { align: 'right' });
+                 doc.text(formatCurrency(totalValuation), rightMargin, yPos, { align: 'right' });
+                 yPos += 7;
                 
                 doc.setFont(undefined, 'normal');
-                doc.text("Location Base Value:", 14, 62);
-                doc.text(formatCurrency(locationBasePrice), 196, 62, { align: 'right' });
-                doc.text("Income Valuation (85% CoC):", 14, 69);
-                doc.text(incomeValuation, 196, 69, { align: 'right' });
+                 doc.text(`Location Type: ${locationTypeText}`, leftMargin, yPos);
+                 yPos += 7;
+                 doc.text("Location Base Value:", leftMargin, yPos);
+                 doc.text(formatCurrency(locationBasePrice), rightMargin, yPos, { align: 'right' });
+                 yPos += 7;
+                 doc.text("Income Valuation (85% CoC):", leftMargin, yPos);
+                 doc.text(formatCurrency(incomeValuation), rightMargin, yPos, { align: 'right' });
+                 yPos += 16;
 
                 // Financials Section
                 doc.setFontSize(16);
-                doc.text("Key Financials", 14, 85);
-                doc.line(14, 87, 196, 87);
+                 doc.text("Key Financials", leftMargin, yPos);
+                 yPos += 2;
+                 doc.line(leftMargin, yPos, rightMargin, yPos);
+                 yPos += 8;
                 
                 doc.setFontSize(12);
-                doc.text("Annual Revenue:", 14, 95);
-                doc.text(formatCurrency(annualRevenue), 196, 95, { align: 'right' });
-                doc.text("Annual Cash Flow:", 14, 102);
+                 doc.text("Annual Revenue:", leftMargin, yPos);
+                 doc.text(formatCurrency(annualRevenue), rightMargin, yPos, { align: 'right' });
+                 yPos += 7;
+                 doc.text("Annual Cash Flow:", leftMargin, yPos);
                 doc.setFont(undefined, 'bold');
-                doc.text(formatCurrency(annualCashFlow), 196, 102, { align: 'right' });
+                 doc.text(formatCurrency(annualCashFlow), rightMargin, yPos, { align: 'right' });
+                 yPos += 16;
 
                 // Expenses Breakdown Section
                 doc.setFontSize(16);
                 doc.setFont(undefined, 'normal');
-                doc.text("Annual Expense Breakdown", 14, 118);
-                doc.line(14, 120, 196, 120);
+                 doc.text("Annual Expense Breakdown", leftMargin, yPos);
+                 yPos += 2;
+                 doc.line(leftMargin, yPos, rightMargin, yPos);
+                 yPos += 8;
 
                 doc.setFontSize(12);
-                doc.text(`Commission (${commissionPercent}%):`, 14, 128);
-                doc.text(formatCurrency(annualCommission), 196, 128, { align: 'right' });
-                doc.text("Rent:", 14, 135);
-                doc.text(formatCurrency(annualRent), 196, 135, { align: 'right' });
-                doc.text("Supplies:", 14, 142);
-                doc.text(formatCurrency(annualSupplies), 196, 142, { align: 'right' });
-                doc.text("Utilities:", 14, 149);
-                doc.text(formatCurrency(annualUtilities), 196, 149, { align: 'right' });
-                doc.text(`Processor Fees (${processorFeePercent}%):`, 14, 156);
-                doc.text(formatCurrency(annualProcessorFees), 196, 156, { align: 'right' });
+                 doc.text(`Commission (${commissionPercent}%):`, leftMargin, yPos);
+                 doc.text(formatCurrency(annualCommission), rightMargin, yPos, { align: 'right' });
+                 yPos += 7;
+                 doc.text("Rent:", leftMargin, yPos);
+                 doc.text(formatCurrency(annualRent), rightMargin, yPos, { align: 'right' });
+                 yPos += 7;
+                 doc.text("Supplies:", leftMargin, yPos);
+                 doc.text(formatCurrency(annualSupplies), rightMargin, yPos, { align: 'right' });
+                 yPos += 7;
+                 doc.text("Utilities:", leftMargin, yPos);
+                 doc.text(formatCurrency(annualUtilities), rightMargin, yPos, { align: 'right' });
+                 yPos += 7;
+                 doc.text(`Processor Fees (${processorFeePercent}%):`, leftMargin, yPos);
+                 doc.text(formatCurrency(annualProcessorFees), rightMargin, yPos, { align: 'right' });
+                 yPos += 7;
+                 doc.setLineWidth(0.2);
+                 doc.line(leftMargin, yPos, rightMargin, yPos); // Separator line
+                 yPos += 7;
+                 doc.setFont(undefined, 'bold');
+                 doc.text('Total Annual Expenses:', leftMargin, yPos);
+                 doc.text(formatCurrency(totalAnnualExpenses), rightMargin, yPos, { align: 'right' });
+
 
                 // Footer
+                 const pageHeight = doc.internal.pageSize.getHeight();
                 doc.setFontSize(10);
                 doc.setTextColor(150);
-                doc.text("Report generated by Business Calculators App.", 105, 280, { align: 'center' });
+                 doc.text("Report generated by Business Calculators App.", doc.internal.pageSize.getWidth() / 2, pageHeight - 10, { align: 'center' });
 
-                doc.save('Nail-Salon-Valuation-Report.pdf');
+                 doc.save('Nail-Salon-Valuation-Report.pdf');
             }
 
             // Add event listeners to all inputs in the valuation tab
             Object.values(valInputs).forEach(inputElement => {
-                inputElement.addEventListener('input', calculateValuation);
+                 // Use 'change' for radio buttons for better performance
+                 if (inputElement.id === 'location-type-selector') {
+                    inputElement.addEventListener('change', calculateValuation);
+                 } else {
+                    inputElement.addEventListener('input', calculateValuation);
+                 }
             });
             
             printBtn.addEventListener('click', generatePDF);
             
             calculateValuation(); // Initial calculation on load
         }
+        
+        function setupSocialMediaAssistant() {
+            // Placeholder for Cloud Function URL - Replace with your actual deployed URL
+            const CLOUD_FUNCTION_URL = 'YOUR_CLOUD_FUNCTION_URL_HERE'; // <--- PASTE YOUR FUNCTION URL HERE
 
+            const MODEL_SYSTEM_PROMPT = `You are a friendly and enthusiastic social media manager for 'Ecco Nails and Spa', located at 4300 W Lake Mary Blvd, Lake Mary, FL 32746. Your goal is to generate upbeat, professional, and enticing Instagram captions and relevant hashtags. Always include the spa's location (Lake Mary, FL) in the caption. NEVER use emojis. Your tone should be relaxing, luxurious, and inviting.`;
+
+            // --- DOM Elements ---
+            const socialForm = document.getElementById('social-form');
+            const postTopicInput = document.getElementById('social-post-topic');
+            const generateBtn = document.getElementById('social-generate-btn');
+            const btnText = document.getElementById('social-btn-text');
+            const btnSpinner = document.getElementById('social-btn-spinner');
+            const errorContainer = document.getElementById('social-error');
+            const resultsContainer = document.getElementById('social-results');
+            const captionResultContainer = document.getElementById('social-caption-result');
+            const captionOutput = document.getElementById('social-caption-output');
+            const hashtagsResultContainer = document.getElementById('social-hashtags-result');
+            const hashtagsOutput = document.getElementById('social-hashtags-output');
+            const ideasDropdown = document.getElementById('social-ideas-dropdown').querySelector('div');
+            const copyBtns = document.querySelectorAll('.social-copy-btn');
+
+            const postIdeas = [
+                "Fresh manicure (classic)",
+                "Gel manicure (long-lasting)",
+                "Elaborate nail art design",
+                "Relaxing pedicure",
+                "Seasonal colors (e.g., fall, summer)",
+                "Spa day package",
+                "Special promotion or discount",
+            ];
+
+            // --- Populate Post Ideas ---
+            postIdeas.forEach(idea => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100';
+                button.setAttribute('role', 'menuitem');
+                button.textContent = idea;
+                button.onclick = () => {
+                    postTopicInput.value = idea;
+                    // Close dropdown (by unfocusing the trigger)
+                    document.activeElement.blur();
+                };
+                ideasDropdown.appendChild(button);
+            });
+
+            // --- Form Submit Handler ---
+            socialForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const postTopic = postTopicInput.value.trim();
+
+                if (!postTopic) {
+                    errorContainer.textContent = "Please enter a topic for the post.";
+                    errorContainer.classList.remove('hidden');
+                    return;
+                }
+                
+                if (CLOUD_FUNCTION_URL === 'YOUR_CLOUD_FUNCTION_URL_HERE') {
+                    errorContainer.textContent = `Cloud Function URL not configured. Please update the placeholder in the code.`;
+                    errorContainer.classList.remove('hidden');
+                    return; // Stop execution if URL is not set
+                 }
+
+                // Set loading state
+                generateBtn.disabled = true;
+                btnText.classList.add('hidden');
+                btnSpinner.classList.remove('hidden');
+                errorContainer.classList.add('hidden');
+                resultsContainer.classList.add('hidden');
+
+                const userQuery = `Generate an Instagram caption and a list of 10-15 relevant hashtags for a post about: "${postTopic}".`;
+
+                const payloadToFunction = {
+                    userQuery: userQuery,
+                    type: 'social' // Specify the type for the Cloud Function
+                };
+
+                try {
+                    // Use fetchWithBackoff OR just fetch directly to your function
+                    const response = await fetchWithBackoff(() => 
+                        fetch(CLOUD_FUNCTION_URL, { // <--- Use Cloud Function URL
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payloadToFunction) // <--- Send specific data + type
+                        })
+                    );
+
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        console.error(`Proxy function error (${response.status}): ${errorText}`);
+                        throw new Error(`Proxy function request failed with status ${response.status}`);
+                    }
+
+                    const jsonText = await response.text(); // The function returns the JSON string directly
+                    
+                    try {
+                         // We already have the JSON string, parse it
+                        const parsedJson = JSON.parse(jsonText);
+
+                        // Update UI 
+                        captionOutput.textContent = parsedJson.caption || "No caption generated.";
+                        hashtagsOutput.textContent = (parsedJson.hashtags || []).join(' ');
+                        
+                        captionResultContainer.classList.toggle('hidden', !parsedJson.caption);
+                        hashtagsResultContainer.classList.toggle('hidden', !(parsedJson.hashtags && parsedJson.hashtags.length > 0));
+                        resultsContainer.classList.remove('hidden');
+
+                    } catch (parseError) {
+                         console.error("Failed to parse JSON response from proxy:", jsonText);
+                         throw new Error("Invalid JSON received from proxy function.");
+                    }
+
+                } catch (err) {
+                    console.error("Error calling proxy function or processing response:", err);
+                    errorContainer.textContent = `Sorry, we couldn't generate content. Please check function logs or try again. Details: ${err.message}`;
+                    errorContainer.classList.remove('hidden');
+                } finally {
+                    // Reset loading state
+                    generateBtn.disabled = false;
+                    btnText.classList.remove('hidden');
+                    btnSpinner.classList.add('hidden');
+                }
+            });
+
+            // --- Copy Button Handler ---
+            copyBtns.forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const type = btn.dataset.type;
+                    const textToCopy = (type === 'caption')
+                        ? captionOutput.textContent
+                        : hashtagsOutput.textContent;
+                    
+                    const success = await copyToClipboard(textToCopy);
+
+                    if (success) {
+                        const copyText = btn.querySelector('.copy-text');
+                        const copyIcon = btn.querySelector('.copy-icon');
+                        const checkIcon = btn.querySelector('.check-icon');
+
+                        copyText.textContent = 'Copied!';
+                        copyIcon.classList.add('hidden');
+                        checkIcon.classList.remove('hidden');
+
+                        setTimeout(() => {
+                            copyText.textContent = 'Copy';
+                            copyIcon.classList.remove('hidden');
+                            checkIcon.classList.add('hidden');
+                        }, 2000);
+                    } else {
+                        // Simple alert fallback if copy fails
+                        const tempAlert = document.createElement('div');
+                        tempAlert.textContent = 'Failed to copy!';
+                        tempAlert.className = 'fixed top-5 right-5 bg-red-500 text-white p-3 rounded-md shadow-lg';
+                        document.body.appendChild(tempAlert);
+                        setTimeout(() => document.body.removeChild(tempAlert), 2000);
+                    }
+                });
+            });
+        }
 
     </script>
 </body>
